@@ -6,9 +6,9 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{8667FF7A-8436-4F85-A3CB-2A130118E3DF}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject>MediaInfo.NET.MainForm</StartupObject>
-    <RootNamespace>MediaInfo.NET</RootNamespace>
-    <AssemblyName>MediaInfo.NET</AssemblyName>
+    <StartupObject>MediaInfoNET.MainForm</StartupObject>
+    <RootNamespace>MediaInfoNET</RootNamespace>
+    <AssemblyName>MediaInfoNET</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsFormsWithCustomSubMain</MyType>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
