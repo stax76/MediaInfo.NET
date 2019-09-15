@@ -22,7 +22,7 @@ At the moment there is no shell integration, it can be achieved with my shell ex
 
 From my experience with my other projects I've learned that it takes years of hard work to make a project successful. I'm not sure if I'm willing to do that for this project. It might take a very long time before I add more features if ever, it depends if I get positive feedback on the application so click on the star button and leave a comment.
 
-#### Features under consideration:
+#### Features under consideration
 
 - Shell integration, possible options are file associations via setup or script or a shell extension
 - Shortcut keys to navigate to the next and previous file
