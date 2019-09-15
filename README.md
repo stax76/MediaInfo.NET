@@ -8,7 +8,7 @@ Files can be opened via Drag & Drop and via command line:
 
 If you are a StaxRip user you can alternativly integrate StaxRip's MediaInfo frontend via:
 
-StaxRip -mediainfo <input file>
+`StaxRip -mediainfo <input file>`
 
 StaxRip's MediaInfo frontend features a developer mode that shows the property names used for development instead of the user friendly property names.
 
