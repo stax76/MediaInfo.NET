@@ -19,8 +19,8 @@ From my experience with my other projects I've learned that it takes years of ha
 #### Features under consideration:
 
 - Shell integration, possible options are file associations via setup or script or a shell extension
-- Shortcut to navigate to the next and previous file
-- Developer mode
+- Shortcut keys to navigate to the next and previous file
+- Developer mode to show the development versions of the property names
 - Your ideas?
 
 ## Screenshots
