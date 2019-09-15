@@ -1,6 +1,12 @@
 # MediaInfo.NET
 
-MediaInfo.NET is a alternative MediaInfo frontend. Unlike the original frontend it supports High DPI and a search/filter feature.
+MediaInfo.NET is a alternative MediaInfo frontend.
+
+## Features
+
+- High DPI support
+- A search/filter feature
+- A tab bar showing each track in a dedicated tab
 
 Files can be opened via Drag & Drop and via command line:
 
@@ -21,6 +27,7 @@ From my experience with my other projects I've learned that it takes years of ha
 - Shell integration, possible options are file associations via setup or script or a shell extension
 - Shortcut keys to navigate to the next and previous file
 - Developer mode to show the development versions of the property names
+- Remember the window size
 - Your ideas?
 
 ## Screenshots

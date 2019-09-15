@@ -1,3 +1,4 @@
+Imports System.IO
 Imports System.Text
 
 Public Class MainForm
@@ -107,7 +108,7 @@ Public Class MainForm
     Private ActiveGroup As String
     Private Items As New List(Of Item)
 
-    Sub New(fp As String)
+    Sub New()
         MyBase.New()
 
         InitializeComponent()
@@ -127,12 +128,30 @@ Public Class MainForm
         tv.FullRowSelect = True
         tv.ShowPlusMinus = False
 
-        SourcePath = fp
-        Text = "MediaInfo - " + fp + " - " + Application.ProductVersion
-        Parse()
+        If Environment.GetCommandLineArgs.Length > 1 AndAlso File.Exists(Environment.GetCommandLineArgs(1)) Then
+            SourcePath = Environment.GetCommandLineArgs(1)
+            Text = "MediaInfo - " + Environment.GetCommandLineArgs(1) + " - " + Application.ProductVersion
+            Parse()
+        Else
+            Dim readmeFile = Application.StartupPath + "\readme.md"
+
+            If File.Exists(readmeFile) Then
+                rtb.Text = File.ReadAllText(readmeFile)
+                rtb.WordWrap = True
+            End If
+        End If
+
         ActiveControl = tbSearch
 
-        AddHandler tbSearch.TextChanged, Sub() If tv.SelectedNode Is tv.Nodes(1) Then UpdateItems() Else tv.SelectedNode = tv.Nodes(1)
+        AddHandler tbSearch.TextChanged, Sub()
+                                             If tv.Nodes.Count = 0 Then Exit Sub
+
+                                             If tv.SelectedNode Is tv.Nodes(1) Then
+                                                 UpdateItems()
+                                             Else
+                                                 tv.SelectedNode = tv.Nodes(1)
+                                             End If
+                                         End Sub
     End Sub
 
     Sub UpdateItems()
@@ -277,7 +296,7 @@ Public Class MainForm
     Shared Sub Main()
         Application.EnableVisualStyles()
         Application.SetCompatibleTextRenderingDefault(False)
-        Application.Run(New MainForm(Environment.GetCommandLineArgs(1)))
+        Application.Run(New MainForm())
     End Sub
 
     Shared Function FormatColumn(value As String, delimiter As String) As String
