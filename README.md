@@ -6,7 +6,7 @@ Files can be opened via Drag & Drop and via command line:
 
 `MediaInfoNET <input file>`
 
-If you are a StaxRip user you can alternativly integrate StaxRip's MediaInfo frontend via:
+If you are a StaxRip user you can alternativly use StaxRip's MediaInfo frontend via:
 
 `StaxRip -mediainfo <input file>`
 
