@@ -8,7 +8,7 @@ MediaInfo.NET is a alternative MediaInfo frontend.
 - A search/filter feature
 - A tab bar showing each track in a dedicated tab
 
-Files can be opened via Drag & Drop and via command line:
+Files can be opened via drag & drop and via command line:
 
 `MediaInfoNET <input file>`
 
