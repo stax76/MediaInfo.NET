@@ -1,5 +1,4 @@
-﻿Imports System.IO
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 
 Public Class MediaInfo
@@ -7,7 +6,8 @@ Public Class MediaInfo
 
     Private Handle As IntPtr
     Private Shared Loaded As Boolean
-    Shared Cache As New Dictionary(Of String, MediaInfo)
+
+    Shared Property RawView As Boolean
 
     Sub New(path As String)
         If Not Loaded Then
@@ -17,51 +17,36 @@ Public Class MediaInfo
 
         Handle = MediaInfo_New()
         MediaInfo_Open(Handle, path)
-    End Sub
 
-    Shared Function GetMediaInfo(path As String) As MediaInfo
-        If path = "" Then Return Nothing
-        Dim key = path & File.GetLastWriteTime(path).Ticks
-        If Cache.ContainsKey(key) Then Return Cache(key)
-        Dim ret As New MediaInfo(path)
-        Cache(key) = ret
-        Return ret
-    End Function
+        If RawView Then
+            MediaInfo_Option(Handle, "Language", "raw")
+        Else
+            MediaInfo_Option(Handle, "Language", "")
+        End If
+    End Sub
 
     Function GetGeneral(parameter As String) As String
         Return GetInfo(MediaInfoStreamKind.General, parameter)
-    End Function
-
-    Shared Function GetGeneral(path As String, parameter As String) As String
-        Return GetInfo(path, MediaInfoStreamKind.General, parameter)
     End Function
 
     Function GetInfo(streamKind As MediaInfoStreamKind, parameter As String) As String
         Return Marshal.PtrToStringUni(MediaInfo_Get(Handle, streamKind, 0, parameter, MediaInfoInfoKind.Text, MediaInfoInfoKind.Name))
     End Function
 
-    Shared Function GetInfo(path As String, streamKind As MediaInfoStreamKind, parameter As String) As String
-        If path = "" Then Return ""
-        Return GetMediaInfo(path).GetInfo(streamKind, parameter)
-    End Function
-
-    Shared Function GetSummary(path As String) As String
-        Dim mi = GetMediaInfo(path)
-        MediaInfo_Option(mi.Handle, "Complete", "0")
-        Dim ret = Marshal.PtrToStringUni(MediaInfo_Inform(mi.Handle, 0))
+    Function GetSummary() As String
+        MediaInfo_Option(Handle, "Complete", "0")
+        Dim ret = Marshal.PtrToStringUni(MediaInfo_Inform(Handle, 0))
         If ret.Contains("UniqueID/String") Then ret = Regex.Replace(ret, "UniqueID/String +: .+\n", "")
         If ret.Contains("Unique ID") Then ret = Regex.Replace(ret, "Unique ID +: .+\n", "")
         If ret.Contains("Encoded_Library_Settings") Then ret = Regex.Replace(ret, "Encoded_Library_Settings +: .+\n", "")
         If ret.Contains("Encoding settings") Then ret = Regex.Replace(ret, "Encoding settings +: .+\n", "")
         If ret.Contains("Format settings, ") Then ret = ret.Replace("Format settings, ", "Format, ")
-
         Return MainForm.FormatColumn(ret, ":").Trim
     End Function
 
-    Shared Function GetCompleteSummary(path As String) As String
-        Dim mi = GetMediaInfo(path)
-        MediaInfo_Option(mi.Handle, "Complete", "1")
-        Return Marshal.PtrToStringUni(MediaInfo_Inform(mi.Handle, 0))
+    Function GetCompleteSummary() As String
+        MediaInfo_Option(Handle, "Complete", "1")
+        Return Marshal.PtrToStringUni(MediaInfo_Inform(Handle, 0))
     End Function
 
 #Region "IDisposable"

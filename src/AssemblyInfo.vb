@@ -9,7 +9,7 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("MediaInfo.NET")>
-<Assembly: AssemblyDescription("Simple MediaInfo GUI")>
+<Assembly: AssemblyDescription("MediaInfo GUI")>
 <Assembly: AssemblyCompany("Frank Skare (stax76)")>
 <Assembly: AssemblyProduct("MediaInfo.NET")>
 <Assembly: AssemblyCopyright("Copyright ©  2019 Frank Skare (stax76)")>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")>
 
-<Assembly: AssemblyVersion("1.0.0.0")>
-<Assembly: AssemblyFileVersion("1.0.0.0")>
+<Assembly: AssemblyVersion("2.0.0.0")>
+<Assembly: AssemblyFileVersion("2.0.0.0")>
