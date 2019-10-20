@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Info.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>MediaInfoNET</AssemblyName>
+    <RootNamespace>MediaInfoNET</RootNamespace>
+    <StartupObject>Program</StartupObject>
+    <Product>MediaInfo.NET</Product>
+    <Company>Frank Skare (stax76)</Company>
+    <Authors>Frank Skare (stax76)</Authors>
+    <Version>3.0</Version>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <PackageId>MediaInfo.NET</PackageId>
+    <Description>Alternative MediaInfo GUI</Description>
+    <Copyright>2019 Frank Skare (stax76)</Copyright>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl></RepositoryUrl>
+  </PropertyGroup>
+
+</Project>

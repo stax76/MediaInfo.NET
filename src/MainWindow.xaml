@@ -1,0 +1,125 @@
+﻿<Window x:Class="MediaInfoNET.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        
+        KeyDown="Window_KeyDown"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        PreviewDragOver="Window_PreviewDragOver"
+        Background="#1E1E1E">
+
+    <Grid FocusManager.FocusedElement="{Binding ElementName=SearchTextBox}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <TextBlock Name="HintTextBlock"
+                       Text="Search"
+                       Padding="5 0 0 0" 
+                       Foreground="#E6E6E6"
+                       Background="#1E1E1E"
+                       VerticalAlignment="Center" />
+
+            <Border BorderThickness="0 0 0 1" BorderBrush="#E6E6E6">
+               <TextBox Name="SearchTextBox"
+                        Height="30"
+                        VerticalContentAlignment="Center"
+                        Padding="1,2,0,0"
+                        BorderThickness="0 0 0 0"
+                        Background="Transparent"
+                        TextChanged="SearchTextBox_TextChanged"
+                        Foreground="#E6E6E6" CaretBrush="White" />
+            </Border>        
+            
+            <Button Name="ClearButton"
+                    Content="r"
+                    HorizontalAlignment="Right"
+                    Margin="0 0 5 0"
+                    FontSize="12"
+                    FontFamily="Marlett"
+                    Width="20"
+                    Height="20"
+                    Visibility="Hidden"
+                    Click="ClearButton_Click">
+                
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#686868"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#A0A0A0"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
+
+        <ListBox Name="TabListBox"
+                 Grid.Row="1" 
+                 SelectionChanged="TabListBox_SelectionChanged"
+                 Background="#1E1E1E"
+                 Foreground="#E6E6E6"
+                 BorderThickness="0">
+            
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}"
+                               VerticalAlignment="Center"
+                               Padding="7">
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Border BorderThickness="1 0 0 0"
+                BorderBrush="#E6E6E6"
+                Grid.Column="1"
+                Grid.RowSpan="2">
+            
+            <TextBox Name="ContentTextBox"
+                     IsReadOnly="True"
+                     HorizontalScrollBarVisibility="Auto"
+                     VerticalScrollBarVisibility="Auto"
+                     Background="#1E1E1E"
+                     Foreground="#E6E6E6"
+                     BorderThickness="0"
+                     Padding="10"
+                     AllowDrop="True"
+                     Drop="ContentTextBox_Drop"
+                     PreviewDragOver="ContentTextBox_PreviewDragOver">
+
+                <TextBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Name="CopyMenuItem"     Header="Copy" InputGestureText="Ctrl+C" IsEnabled="False" Click="CopyMenuItem_Click" />
+                        <Separator />
+                        <MenuItem Name="PreviousMenuItem" Header="Previous" InputGestureText="F11" IsEnabled="False" Click="PreviousMenuItem_Click" />
+                        <MenuItem Name="NextMenuItem"     Header="Next"     InputGestureText="F12" IsEnabled="False" Click="NextMenuItem_Click" />
+                        <Separator />
+                        <MenuItem Name="SetupMenuItem"    Header="Install/Uninstall" Click="SetupMenuItem_Click" />
+                        <MenuItem Name="SettingsMenuItem" Header="Settings..." Click="SettingsMenuItem_Click" />
+                    </ContextMenu>
+                </TextBox.ContextMenu>
+            </TextBox>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MediaInfo.NET": {
+      "commandName": "Project",
+      "commandLineArgs": "\"D:\\Samples\\Big Buck Bunny.mkv\""
+    }
+  }
+}
