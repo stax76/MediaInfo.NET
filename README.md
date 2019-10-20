@@ -35,4 +35,4 @@ F11/F12 navigates to the previous or next file in the folder.
 Monospaced font: Consolas, Courier New or if installed Cascadia Code.
 
 ### raw-view
-raw view shows developers the parameter names as they are used in the MediaInfo API.
+raw-view shows developers the parameter names as they are used in the MediaInfo API.
