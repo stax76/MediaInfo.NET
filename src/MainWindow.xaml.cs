@@ -37,12 +37,12 @@ namespace MediaInfoNET
             if (!File.Exists(SettingsFile))
             {
                 string content = @"
-font = Consolas
-font-size = 13
+font = consolas
+font-size = 14
 window-width = 700
 window-height = 550
 center-screen = yes
-raw-view = no
+raw-view = yes
 word-wrap = no
 ";
                 File.WriteAllText(SettingsFile, content);
@@ -100,7 +100,7 @@ word-wrap = no
             PreviousMenuItem.IsEnabled = Directory.GetFiles(Path.GetDirectoryName(file)).Length > 1;
             NextMenuItem.IsEnabled = PreviousMenuItem.IsEnabled;
             SourcePath = file;
-            Title = file + " - " + FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location).ProductName;
+            Title = file + " - " + FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location).ProductName + " " + FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location).FileVersion;
             List<TabItem> tabItems = new List<TabItem>();
             tabItems.Clear();
             HashSet<string> captionNames = new HashSet<string>();
@@ -121,7 +121,9 @@ word-wrap = no
 
             TabListBox.ItemsSource = tabItems;
 
-            if (tabItems.Count > 0)
+            if (tabItems.Count > 1 && SearchTextBox.Text != "")
+                TabListBox.SelectedIndex = 1;
+            else if (tabItems.Count > 0)
                 TabListBox.SelectedIndex = 0;
         }
 

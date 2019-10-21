@@ -102,6 +102,7 @@
                      VerticalScrollBarVisibility="Auto"
                      Background="#1E1E1E"
                      Foreground="#E6E6E6"
+                     SelectionBrush="AliceBlue"
                      BorderThickness="0"
                      Padding="10"
                      AllowDrop="True"
