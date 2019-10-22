@@ -43,7 +43,7 @@ raw-view shows developers the parameter names as they are used in the MediaInfo 
 
 font = consolas  
 font-size = 14  
-window-width = 700  
+window-width = 750  
 window-height = 550  
 center-screen = yes  
 raw-view = yes  
