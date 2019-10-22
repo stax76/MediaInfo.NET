@@ -102,7 +102,8 @@ word-wrap = no";
             PreviousMenuItem.IsEnabled = Directory.GetFiles(Path.GetDirectoryName(file)).Length > 1;
             NextMenuItem.IsEnabled = PreviousMenuItem.IsEnabled;
             SourcePath = file;
-            Title = file + " - " + FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location).ProductName + " " + FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location).FileVersion;
+            Title = file + " - " + FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location).ProductName +
+                " " + FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location).FileVersion;
             List<TabItem> tabItems = new List<TabItem>();
             tabItems.Clear();
             HashSet<string> captionNames = new HashSet<string>();
@@ -362,9 +363,7 @@ word-wrap = no";
             ContentRichTextBox.Document.Blocks.Add(new Paragraph(new Run(text)));
 
             if (Wrap)
-            {
                 ContentRichTextBox.Document.PageWidth = ContentRichTextBox.Width;
-            }
             else
             {          
                 FormattedText formatted = new FormattedText(
@@ -396,7 +395,7 @@ word-wrap = no";
             }
         }
 
-        public TextRange? FindTextInRange(TextRange searchRange, string searchText)
+        TextRange? FindTextInRange(TextRange searchRange, string searchText)
         {
             int offset = searchRange.Text.IndexOf(searchText, StringComparison.OrdinalIgnoreCase);
 
