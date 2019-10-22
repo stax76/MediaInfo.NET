@@ -32,7 +32,7 @@ public class RegHelp
     public static object? GetValue(string path, string? name, object? defaultValue = null)
     {
         using (RegistryKey regKey = GetRootKey(path).OpenSubKey(path.Substring(5)))
-            return regKey == null ? null : regKey.GetValue(name, defaultValue);
+            return regKey == null ? defaultValue : regKey.GetValue(name, defaultValue);
     }
 
     public static void RemoveKey(string path)
