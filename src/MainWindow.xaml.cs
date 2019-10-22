@@ -55,7 +55,7 @@ word-wrap = no";
                 LoadFile(Environment.GetCommandLineArgs()[1]);
         }
 
-        private void ReadSettings()
+        void ReadSettings()
         {
             foreach (string line in File.ReadAllLines(SettingsFile))
             {
@@ -459,7 +459,7 @@ word-wrap = no";
             LoadFile(SourcePath);
         }
 
-        private void TabListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        void TabListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (TabListBox.SelectedItem != null)
                 ActiveGroup = (TabListBox.SelectedItem as TabItem)?.Value ?? "";
@@ -468,32 +468,32 @@ word-wrap = no";
             ContentRichTextBox.ScrollToHome();
         }
 
-        private void CopyMenuItem_Click(object sender, RoutedEventArgs e)
+        void CopyMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Clipboard.SetText(ContentRichTextBox.Selection.Text);
         }
 
-        private void ContentTextBox_SelectionChanged(object sender, RoutedEventArgs e)
+        void ContentTextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             CopyMenuItem.IsEnabled = ContentRichTextBox.Selection.Text.Length > 0;
         }
 
-        private void PreviousMenuItem_Click(object sender, RoutedEventArgs e)
+        void PreviousMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Previous();
         }
 
-        private void NextMenuItem_Click(object sender, RoutedEventArgs e)
+        void NextMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Next();
         }
 
-        private void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
+        void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
         {
             ShowSettings();
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+        void Window_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
@@ -510,7 +510,7 @@ word-wrap = no";
             }
         }
 
-        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             string text = SearchTextBox.Text;
             HintTextBlock.Text = text == "" ? "Search" : "";
@@ -523,18 +523,18 @@ word-wrap = no";
             }
         }
 
-        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             SearchTextBox.Text = "";
             Keyboard.Focus(SearchTextBox);
         }
 
-        private void Window_Drop(object sender, DragEventArgs e)
+        void Window_Drop(object sender, DragEventArgs e)
         {
             HandleDrop(e);
         }
 
-        private void ContentTextBox_Drop(object sender, DragEventArgs e)
+        void ContentTextBox_Drop(object sender, DragEventArgs e)
         {
             HandleDrop(e);
         }
@@ -548,19 +548,19 @@ word-wrap = no";
             }
         }
 
-        private void ContentTextBox_PreviewDragOver(object sender, DragEventArgs e)
+        void ContentTextBox_PreviewDragOver(object sender, DragEventArgs e)
         {
             e.Effects = DragDropEffects.All;
             e.Handled = true;
         }
 
-        private void Window_PreviewDragOver(object sender, DragEventArgs e)
+        void Window_PreviewDragOver(object sender, DragEventArgs e)
         {
             e.Effects = DragDropEffects.All;
             e.Handled = true;
         }
 
-        private void SetupMenuItem_Click(object sender, RoutedEventArgs e)
+        void SetupMenuItem_Click(object sender, RoutedEventArgs e)
         {
             MessageBoxResult result = MessageBox.Show("Click yes to install and no to uninstall.",
                 "Setup", MessageBoxButton.YesNoCancel);

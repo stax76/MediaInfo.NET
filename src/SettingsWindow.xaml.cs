@@ -16,7 +16,7 @@ namespace MediaInfoNET
             set => MainTextBox = value;
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+        void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
                 Close();

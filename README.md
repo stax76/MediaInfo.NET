@@ -15,7 +15,7 @@ MediaInfo.NET is a alternative MediaInfo frontend.
 
 ## Installation
 
-Install the .NET Core 3.0 Runtime.
+**Install the .NET Core 3.0 Runtime.**
 
 Right-click to show the context menu and choose Install to register common file associations, File Explorer will then show a MediaInfo menu item in the context menu. For custom file extensions use [Open with++](https://github.com/stax76/OpenWithPlusPlus).
 
