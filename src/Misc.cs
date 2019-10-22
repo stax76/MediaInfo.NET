@@ -13,8 +13,8 @@ public class RegHelp
 {
     public static void SetValue(string path, string? name, object value)
     {
-        using (RegistryKey regKey = GetRootKey(path).CreateSubKey(path.Substring(5), RegistryKeyPermissionCheck.ReadWriteSubTree))
-            regKey.SetValue(name, value);
+        using (RegistryKey? regKey = GetRootKey(path)?.CreateSubKey(path.Substring(5), RegistryKeyPermissionCheck.ReadWriteSubTree))
+            regKey?.SetValue(name, value);
     }
 
     public static string GetString(string path, string? name, string defaultValue = "")
@@ -31,29 +31,30 @@ public class RegHelp
 
     public static object? GetValue(string path, string? name, object? defaultValue = null)
     {
-        using (RegistryKey regKey = GetRootKey(path).OpenSubKey(path.Substring(5)))
+        using (RegistryKey? regKey = GetRootKey(path)?.OpenSubKey(path.Substring(5)))
             return regKey == null ? defaultValue : regKey.GetValue(name, defaultValue);
     }
 
     public static void RemoveKey(string path)
     {
-        GetRootKey(path).DeleteSubKeyTree(path.Substring(5), false);
+        GetRootKey(path)?.DeleteSubKeyTree(path.Substring(5), false);
     }
 
     public static void RemoveValue(string path, string name)
     {
-        using (RegistryKey regKey = GetRootKey(path).OpenSubKey(path.Substring(5), true))
+        using (RegistryKey? regKey = GetRootKey(path)?.OpenSubKey(path.Substring(5), true))
             regKey?.DeleteValue(name, false);
     }
 
-    static RegistryKey GetRootKey(string path)
+    static RegistryKey? GetRootKey(string path)
     {
         switch (path.Substring(0, 4))
         {
             case "HKLM": return Registry.LocalMachine;
             case "HKCU": return Registry.CurrentUser;
             case "HKCR": return Registry.ClassesRoot;
-            default: throw new Exception("unknown registry root key");
         }
+
+        return null;
     }
 }
