@@ -41,7 +41,7 @@ namespace MediaInfoNET
             {
                 string content = @"font = consolas
 font-size = 14
-window-width = 700
+window-width = 750
 window-height = 550
 center-screen = yes
 raw-view = yes
@@ -206,6 +206,25 @@ word-wrap = no";
                 item.Value = item.Value.Replace("bit3", "bits");
         }
 
+        string GetValue(string group, string name)
+        {
+            foreach (Item item in Items)
+                if (item.Group == group && item.Name == name)
+                    return item.Value;
+            return "";
+        }
+
+        string Join(List<string> list)
+        {
+            List<string> newList = new List<string>();
+
+            foreach (string i in list)
+                if (!string.IsNullOrEmpty(i))
+                    newList.Add(i);
+
+            return string.Join(", ", newList.ToArray());
+        }
+
         void UpdateItems()
         {
             StringBuilder sb = new StringBuilder();
@@ -213,7 +232,82 @@ word-wrap = no";
 
             if (ActiveGroup == "Basic")
             {
+                List<string> values = new List<string>();
 
+                values.Add(GetValue("General", "Format"));
+                values.Add(GetValue("General", "FileSize/String"));
+                values.Add(GetValue("General", "Duration/String"));
+                values.Add(GetValue("General", "OverallBitRate/String"));
+
+                sb.AppendLine("G: " + Join(values) + "\r\n");
+
+                if (GetValue("Video", "Format") != "")
+                {
+                    values.Clear();
+                    
+                    values.Add(GetValue("Video", "Format"));
+                    values.Add(GetValue("Video", "Format_Profile"));
+                    values.Add(GetValue("Video", "Width") + "x" + GetValue("Video", "Height"));
+                    values.Add(GetValue("Video", "FrameRate").Replace(".000", "") + " FPS");
+                    values.Add(GetValue("Video", "BitRate/String"));
+    
+                    sb.AppendLine("V: " + Join(values) + "\r\n");
+                }
+
+                var audioGroups = Items.Where(item => item.Group.StartsWith("Audio"))
+                                       .Select(item => item.Group)
+                                       .Distinct();
+
+                if (audioGroups.Count() > 0)
+                {
+                    foreach (string group in audioGroups)
+                    {
+                        values.Clear();
+
+                        string lang = GetValue(group, "Language/String");
+
+                        if (lang.Length == 2)
+                            lang = new CultureInfo(lang).EnglishName;
+
+                        values.Add(lang);
+
+                        values.Add(GetValue(group, "Format"));
+                        values.Add(GetValue(group, "BitRate/String"));
+                        values.Add(GetValue(group, "Channel(s)/String").Replace(" channels", "ch"));
+                        values.Add(GetValue(group, "SamplingRate/String"));
+                        values.Add(GetValue(group, "Default/String") == "Yes" ? "Default" : "");
+                        values.Add(GetValue(group, "Forced/String") == "Yes" ? "Forced" : "");
+     
+                        sb.AppendLine("A: " + Join(values));
+                    }
+
+                    sb.AppendLine();
+                }
+
+                var textGroups = Items.Where(item => item.Group.StartsWith("Text"))
+                                      .Select(item => item.Group)
+                                      .Distinct();
+
+                if (textGroups.Count() > 0)
+                {
+                    foreach (string group in textGroups)
+                    {
+                        values.Clear();
+                        string lang = GetValue(group, "Language/String");
+
+                        if (lang.Length == 2)
+                            lang = new CultureInfo(lang).EnglishName;
+
+                        values.Add(lang);
+                        values.Add(GetValue(group, "Format"));
+                        values.Add(GetValue(group, "Default/String") == "Yes" ? "Default" : "");
+                        values.Add(GetValue(group, "Forced/String") == "Yes" ? "Forced" : "");
+
+                        sb.AppendLine("S: " + Join(values));
+                    }
+
+                    sb.AppendLine();
+                }
             }
 
             if (ActiveGroup == "Advanced")
@@ -253,7 +347,7 @@ word-wrap = no";
                 {
                     if (item.Name != "")
                     {
-                        sb.Append(item.Name.PadRight(25));
+                        sb.Append(item.Name.PadRight(30));
                         sb.Append(": ");
                     }
 

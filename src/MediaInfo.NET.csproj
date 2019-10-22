@@ -13,8 +13,8 @@
     <Product>MediaInfo.NET</Product>
     <Company>Frank Skare (stax76)</Company>
     <Authors>Frank Skare (stax76)</Authors>
-    <Version>3.1</Version>
-    <AssemblyVersion>3.1.0.0</AssemblyVersion>
+    <Version>4.0</Version>
+    <AssemblyVersion>4.0.0.0</AssemblyVersion>
     <PackageId>MediaInfo.NET</PackageId>
     <Description>Alternative MediaInfo GUI</Description>
     <Copyright>2019 Frank Skare (stax76)</Copyright>
