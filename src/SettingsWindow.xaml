@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         
-        Title="SettingsWindow"
-        Height="250" Width="300"
+        Title="Settings"
+        Height="250"
+        Width="300"
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
         KeyDown="Window_KeyDown">
-    
+
     <Grid>
         <TextBox Name="MainTextBox"
                  TextWrapping="Wrap"

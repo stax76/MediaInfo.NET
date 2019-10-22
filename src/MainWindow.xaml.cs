@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -14,6 +16,7 @@ namespace MediaInfoNET
 {
     public partial class MainWindow : Window
     {
+        bool Wrap;
         string SettingsFolder = "";
         string SettingsFile = "";
         string SourcePath = "";
@@ -24,7 +27,7 @@ namespace MediaInfoNET
         {
             InitializeComponent();
 
-            ContentTextBox.SelectionChanged += ContentTextBox_SelectionChanged;
+            ContentRichTextBox.SelectionChanged += ContentTextBox_SelectionChanged;
          
             SettingsFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" +
                 FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location).ProductName + @"\";
@@ -36,15 +39,13 @@ namespace MediaInfoNET
 
             if (!File.Exists(SettingsFile))
             {
-                string content = @"
-font = consolas
+                string content = @"font = consolas
 font-size = 14
 window-width = 700
 window-height = 550
 center-screen = yes
 raw-view = yes
-word-wrap = no
-";
+word-wrap = no";
                 File.WriteAllText(SettingsFile, content);
             }
 
@@ -79,9 +80,10 @@ word-wrap = no
                         case "raw-view":
                             MediaInfo.RawView = right == "yes"; break;
                         case "word-wrap":
-                            ContentTextBox.TextWrapping = right == "yes" ? TextWrapping.Wrap : TextWrapping.NoWrap; break;
+                            Wrap = right == "yes"; break;
                         case "center-screen":
-                            WindowStartupLocation = right == "yes" ? WindowStartupLocation.CenterScreen : WindowStartupLocation.Manual; break;
+                            WindowStartupLocation = right == "yes" ? WindowStartupLocation.CenterScreen :
+                                                                     WindowStartupLocation.Manual; break;
                     }
                 }
                 catch (Exception ex)
@@ -149,6 +151,7 @@ word-wrap = no
                     item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
                     item.Group = group;
                     item.IsComplete = true;
+                    Fix(item);
                     items.Add(item);
                 }
                 else
@@ -165,6 +168,7 @@ word-wrap = no
                     item.Name = line.Substring(0, line.IndexOf(":")).Trim();
                     item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
                     item.Group = group;
+                    Fix(item);
                     items.Add(item);
                 }
                 else
@@ -174,10 +178,43 @@ word-wrap = no
             return items;
         }
 
+        void Fix(Item item)
+        {
+            if (item.Name.StartsWith("FrameRate/"))
+            {
+                if (item.Value.Contains("fps1"))
+                    item.Value = item.Value.Replace("fps1", "FPS");
+                else if (item.Value.Contains("fps2"))
+                    item.Value = item.Value.Replace("fps2", "FPS");
+                else if (item.Value.Contains("fps3"))
+                    item.Value = item.Value.Replace("fps3", "FPS");
+            }
+            else if ((item.Name.StartsWith("Width/") || item.Name.StartsWith("Height/")) &&
+                item.Value.Contains("pixel3"))
+                
+                item.Value = item.Value.Replace("pixel3", "pixels");
+            else if (item.Name.Contains("Channel"))
+            {
+                if (item.Value.Contains("channel1"))
+                    item.Value = item.Value.Replace("channel1", "channels");
+                else if (item.Value.Contains("channel2"))
+                    item.Value = item.Value.Replace("channel2", "channels");
+                else if (item.Value.Contains("channel3"))
+                    item.Value = item.Value.Replace("channel3", "channels");
+            }
+            else if (item.Name.StartsWith("BitDepth/") && item.Value.Contains("bit3"))
+                item.Value = item.Value.Replace("bit3", "bits");
+        }
+
         void UpdateItems()
         {
-            StringBuilder newText = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             IEnumerable<Item> items;
+
+            if (ActiveGroup == "Basic")
+            {
+
+            }
 
             if (ActiveGroup == "Advanced")
                 items = Items.Where(i => i.IsComplete);
@@ -205,10 +242,10 @@ word-wrap = no
 
             foreach (string group in groups)
             {
-                if (newText.Length == 0)
-                    newText.Append(group + "\r\n\r\n");
+                if (sb.Length == 0)
+                    sb.Append(group + "\r\n\r\n");
                 else
-                    newText.Append("\r\n" + group + "\r\n\r\n");
+                    sb.Append("\r\n" + group + "\r\n\r\n");
 
                 var itemsInGroup = items.Where(i => i.Group == group);
 
@@ -216,16 +253,64 @@ word-wrap = no
                 {
                     if (item.Name != "")
                     {
-                        newText.Append(item.Name.PadRight(25));
-                        newText.Append(": ");
+                        sb.Append(item.Name.PadRight(25));
+                        sb.Append(": ");
                     }
 
-                    newText.Append(item.Value);
-                    newText.Append("\r\n");
+                    sb.Append(item.Value);
+                    sb.Append("\r\n");
                 }
             }
 
-            ContentTextBox.Text = newText.ToString();
+            string text = sb.ToString();
+
+            ContentRichTextBox.Document.Blocks.Clear();
+            ContentRichTextBox.Document.Blocks.Add(new Paragraph(new Run(text)));
+
+            if (Wrap)
+            {
+                ContentRichTextBox.Document.PageWidth = ContentRichTextBox.Width;
+            }
+            else
+            {          
+                FormattedText formatted = new FormattedText(
+                    text,
+                    CultureInfo.CurrentCulture,
+                    System.Windows.FlowDirection.LeftToRight,
+                    new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
+                    FontSize,
+                    Brushes.Black,
+                    VisualTreeHelper.GetDpi(this).PixelsPerDip);
+
+                ContentRichTextBox.Document.PageWidth = formatted.Width + 50;
+            }
+
+            if (SearchTextBox.Text.Length > 1)
+                Highlight(ContentRichTextBox.Document.ContentStart,
+                          ContentRichTextBox.Document.ContentEnd,
+                          SearchTextBox.Text);
+        }
+
+        void Highlight(TextPointer startPos, TextPointer endPos, string find)
+        {
+            TextRange? findRange = FindTextInRange(new TextRange(startPos, endPos), find);
+
+            if (findRange != null)
+            {
+                findRange.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Green);
+                Highlight(findRange.End, endPos, find);
+            }
+        }
+
+        public TextRange? FindTextInRange(TextRange searchRange, string searchText)
+        {
+            int offset = searchRange.Text.IndexOf(searchText, StringComparison.OrdinalIgnoreCase);
+
+            if (offset < 0)
+                return null;
+
+            TextPointer start = searchRange.Start.GetPositionAtOffset(offset);
+            return new TextRange(start, start.GetPositionAtOffset(searchText.Length));
         }
 
         void Previous()
@@ -271,9 +356,9 @@ word-wrap = no
             window.Owner = this;
             window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             window.FontFamily = FontFamily;
-            window.FontSize = FontSize;
-            window.TextBox.Background = ContentTextBox.Background;
-            window.TextBox.Foreground = ContentTextBox.Foreground;
+            window.FontSize = 20;
+            window.TextBox.Background = ContentRichTextBox.Background;
+            window.TextBox.Foreground = ContentRichTextBox.Foreground;
             window.TextBox.Text = File.ReadAllText(SettingsFile);
             window.ShowDialog();
             File.WriteAllText(SettingsFile, window.TextBox.Text);
@@ -287,17 +372,17 @@ word-wrap = no
                 ActiveGroup = (TabListBox.SelectedItem as TabItem)?.Value ?? "";
 
             UpdateItems();
-            ContentTextBox.ScrollToHome();
+            ContentRichTextBox.ScrollToHome();
         }
 
         private void CopyMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Clipboard.SetText(ContentTextBox.SelectedText);
+            Clipboard.SetText(ContentRichTextBox.Selection.Text);
         }
 
         private void ContentTextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
-            CopyMenuItem.IsEnabled = ContentTextBox.SelectedText.Length > 0;
+            CopyMenuItem.IsEnabled = ContentRichTextBox.Selection.Text.Length > 0;
         }
 
         private void PreviousMenuItem_Click(object sender, RoutedEventArgs e)
@@ -384,7 +469,8 @@ word-wrap = no
 
         private void SetupMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Click yes to install and no to uninstall.", "Setup", MessageBoxButton.YesNoCancel);
+            MessageBoxResult result = MessageBox.Show("Click yes to install and no to uninstall.",
+                "Setup", MessageBoxButton.YesNoCancel);
 
             string args = result switch {
                 MessageBoxResult.Yes => "--install",

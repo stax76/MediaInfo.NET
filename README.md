@@ -32,7 +32,19 @@ F11/F12 navigates to the previous or next file in the folder.
 ## Settings
 
 ### font
-Monospaced font: Consolas, Courier New or if installed Cascadia Code.
+
+A monospaced font.
 
 ### raw-view
+
 raw-view shows developers the parameter names as they are used in the MediaInfo API.
+
+### Defaults
+
+font = consolas  
+font-size = 14  
+window-width = 700  
+window-height = 550  
+center-screen = yes  
+raw-view = yes  
+word-wrap = no  

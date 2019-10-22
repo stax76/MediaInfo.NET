@@ -96,20 +96,20 @@
                 Grid.Column="1"
                 Grid.RowSpan="2">
             
-            <TextBox Name="ContentTextBox"
-                     IsReadOnly="True"
-                     HorizontalScrollBarVisibility="Auto"
-                     VerticalScrollBarVisibility="Auto"
-                     Background="#1E1E1E"
-                     Foreground="#E6E6E6"
-                     SelectionBrush="AliceBlue"
-                     BorderThickness="0"
-                     Padding="10"
-                     AllowDrop="True"
-                     Drop="ContentTextBox_Drop"
-                     PreviewDragOver="ContentTextBox_PreviewDragOver">
+            <RichTextBox Name="ContentRichTextBox"
+                         IsReadOnly="True"
+                         HorizontalScrollBarVisibility="Auto"
+                         VerticalScrollBarVisibility="Auto"
+                         Background="#1E1E1E"
+                         Foreground="#E6E6E6"
+                         SelectionBrush="AliceBlue"
+                         BorderThickness="0"
+                         Padding="10"
+                         AllowDrop="True"
+                         Drop="ContentTextBox_Drop"
+                         PreviewDragOver="ContentTextBox_PreviewDragOver">
 
-                <TextBox.ContextMenu>
+                <RichTextBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem Name="CopyMenuItem"     Header="Copy" InputGestureText="Ctrl+C" IsEnabled="False" Click="CopyMenuItem_Click" />
                         <Separator />
@@ -119,8 +119,8 @@
                         <MenuItem Name="SetupMenuItem"    Header="Install/Uninstall" Click="SetupMenuItem_Click" />
                         <MenuItem Name="SettingsMenuItem" Header="Settings..." Click="SettingsMenuItem_Click" />
                     </ContextMenu>
-                </TextBox.ContextMenu>
-            </TextBox>
+                </RichTextBox.ContextMenu>
+            </RichTextBox>
         </Border>
     </Grid>
 </Window>
