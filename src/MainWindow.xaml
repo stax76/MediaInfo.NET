@@ -100,6 +100,7 @@
                          IsReadOnly="True"
                          HorizontalScrollBarVisibility="Auto"
                          VerticalScrollBarVisibility="Auto"
+                         IsReadOnlyCaretVisible="True"
                          Background="#1E1E1E"
                          Foreground="#E6E6E6"
                          SelectionBrush="AliceBlue"
@@ -111,6 +112,7 @@
 
                 <RichTextBox.ContextMenu>
                     <ContextMenu>
+                        <MenuItem Name="OpenFileMenuItem" Header="Open File..." InputGestureText="Ctrl+O" Click="OpenFileMenuItem_Click" />
                         <MenuItem Name="CopyMenuItem"     Header="Copy" InputGestureText="Ctrl+C" IsEnabled="False" Click="CopyMenuItem_Click" />
                         <Separator />
                         <MenuItem Name="PreviousMenuItem" Header="Previous" InputGestureText="F11" IsEnabled="False" Click="PreviousMenuItem_Click" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -22,6 +23,7 @@ namespace MediaInfoNET
         string SourcePath = "";
         String ActiveGroup = "";
         List<Item> Items = new List<Item>();
+        string[] Exclude = {};
 
         public MainWindow()
         {
@@ -45,7 +47,8 @@ window-width = 750
 window-height = 550
 center-screen = yes
 raw-view = yes
-word-wrap = no";
+word-wrap = no
+exclude = UniqueID/String";
                 File.WriteAllText(SettingsFile, content);
             }
 
@@ -53,6 +56,8 @@ word-wrap = no";
 
             if (Environment.GetCommandLineArgs().Length > 1)
                 LoadFile(Environment.GetCommandLineArgs()[1]);
+            else
+                SetText("Drag files here or right-click.");
         }
 
         void ReadSettings()
@@ -69,21 +74,14 @@ word-wrap = no";
                 {
                     switch (left)
                     {
-                        case "font":
-                            FontFamily = new FontFamily(right); break;
-                        case "font-size":
-                            FontSize = int.Parse(right); break;
-                        case "window-width":
-                            Width = int.Parse(right); break;
-                        case "window-height":
-                            Height = int.Parse(right); break;
-                        case "raw-view":
-                            MediaInfo.RawView = right == "yes"; break;
-                        case "word-wrap":
-                            Wrap = right == "yes"; break;
-                        case "center-screen":
-                            WindowStartupLocation = right == "yes" ? WindowStartupLocation.CenterScreen :
-                                                                     WindowStartupLocation.Manual; break;
+                        case "font": FontFamily = new FontFamily(right); break;
+                        case "font-size": FontSize = int.Parse(right); break;
+                        case "window-width": Width = int.Parse(right); break;
+                        case "window-height": Height = int.Parse(right); break;
+                        case "raw-view": MediaInfo.RawView = right == "yes"; break;
+                        case "word-wrap": Wrap = right == "yes"; break;
+                        case "center-screen": WindowStartupLocation = right == "yes" ? WindowStartupLocation.CenterScreen : WindowStartupLocation.Manual; break;
+                        case "exclude": Exclude = right.Split(new[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries); break;
                     }
                 }
                 catch (Exception ex)
@@ -149,6 +147,10 @@ word-wrap = no";
                 {
                     Item item = new Item();
                     item.Name = line.Substring(0, line.IndexOf(":")).Trim();
+
+                    if (Exclude.Contains(item.Name))
+                        continue;
+
                     item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
                     item.Group = group;
                     item.IsComplete = true;
@@ -192,7 +194,7 @@ word-wrap = no";
             }
             else if ((item.Name.StartsWith("Width/") || item.Name.StartsWith("Height/")) &&
                 item.Value.Contains("pixel3"))
-                
+
                 item.Value = item.Value.Replace("pixel3", "pixels");
             else if (item.Name.Contains("Channel"))
             {
@@ -205,6 +207,8 @@ word-wrap = no";
             }
             else if (item.Name.StartsWith("BitDepth/") && item.Value.Contains("bit3"))
                 item.Value = item.Value.Replace("bit3", "bits");
+            else if (item.Name == "Encoded_Library_Settings")
+                Format_Encoded_Library_Settings(item);
         }
 
         string GetValue(string group, string name)
@@ -358,9 +362,7 @@ word-wrap = no";
             }
 
             string text = sb.ToString();
-
-            ContentRichTextBox.Document.Blocks.Clear();
-            ContentRichTextBox.Document.Blocks.Add(new Paragraph(new Run(text)));
+            SetText(text);
 
             if (Wrap)
                 ContentRichTextBox.Document.PageWidth = ContentRichTextBox.Width;
@@ -382,6 +384,12 @@ word-wrap = no";
                 Highlight(ContentRichTextBox.Document.ContentStart,
                           ContentRichTextBox.Document.ContentEnd,
                           SearchTextBox.Text);
+        }
+
+        void SetText(string value)
+        {
+            ContentRichTextBox.Document.Blocks.Clear();
+            ContentRichTextBox.Document.Blocks.Add(new Paragraph(new Run(value)));
         }
 
         void Highlight(TextPointer startPos, TextPointer endPos, string find)
@@ -503,11 +511,15 @@ word-wrap = no";
                     else
                         SearchTextBox.Text = "";
                     break;
-                case Key.F11:
-                    Previous(); break;
-                case Key.F12:
-                    Next(); break;
+                case Key.F11: Previous(); break;
+                case Key.F12: Next(); break;
+                case Key.O when Keyboard.IsKeyDown(Key.LeftCtrl):
+                    OpenFile();
+                    break;
             }
+
+            if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                e.Handled = true;
         }
 
         void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -583,6 +595,324 @@ word-wrap = no";
                     proc.Start();
                 } catch {}
             }
+        }
+
+        void Format_Encoded_Library_Settings(Item item)
+        {
+            Dictionary<string, string> switches = new Dictionary<string, string>();
+
+            switches["allow-non-conformance"] = "Other";
+            switches["amp"] = "Analysis";
+            switches["analysis-load"] = "Analysis";
+            switches["analysis-reuse-file"] = "Analysis";
+            switches["analysis-reuse-level"] = "Analysis";
+            switches["analysis-save"] = "Analysis";
+            switches["analyze-src-pics"] = "Motion Search";
+            switches["aq-mode"] = "Rate Control";
+            switches["aq-motion"] = "Rate Control";
+            switches["aq-strength"] = "Rate Control";
+            switches["asm avx512"] = "Performance";
+            switches["asm"] = "Performance";
+            switches["atc-sei"] = "VUI";
+            switches["aud"] = "Bitstream";
+            switches["b-adapt"] = "Slice Decision";
+            switches["bframe-bias"] = "Slice Decision";
+            switches["bframes"] = "Slice Decision";
+            switches["b-intra"] = "Analysis";
+            switches["b-pyramid"] = "Slice Decision";
+            switches["cbqpoffs"] = "Rate Control";
+            switches["chromaloc"] = "VUI";
+            switches["chunk-end"] = "Input/Output";
+            switches["chunk-start"] = "Input/Output";
+            switches["cip"] = "Other";
+            switches["cll"] = "VUI";
+            switches["colormatrix"] = "VUI";
+            switches["colorprim"] = "VUI";
+            switches["constrained-intra"] = "Other";
+            switches["const-vbv"] = "Rate Control";
+            switches["copy-pic"] = "Performance";
+            switches["cplxblur"] = "Rate Control";
+            switches["crf-max"] = "Rate Control";
+            switches["crf-min"] = "Rate Control";
+            switches["crqpoffs"] = "Rate Control";
+            switches["csv"] = "Statistic";
+            switches["csv-log-level"] = "Statistic";
+            switches["ctu"] = "Analysis";
+            switches["ctu-info"] = "Slice Decision";
+            switches["cu-lossless"] = "Analysis";
+            switches["cu-stats"] = "Analysis";
+            switches["cutree"] = "Rate Control";
+            switches["deblock"] = "Loop Filter";
+            switches["dhdr10-info"] = "VUI";
+            switches["dhdr10-opt"] = "VUI";
+            switches["display-window"] = "VUI";
+            switches["dither"] = "Input/Output";
+            switches["dolby-vision-profile"] = "Bitstream";
+            switches["dolby-vision-rpu"] = "Bitstream";
+            switches["dynamic-rd"] = "Analysis";
+            switches["dynamic-refine"] = "Analysis";
+            switches["early-skip"] = "Analysis";
+            switches["fades"] = "Slice Decision";
+            switches["fast-intra"] = "Analysis";
+            switches["field"] = "Input/Output";
+            switches["force-flush"] = "Slice Decision";
+            switches["fps"] = "Input/Output";
+            switches["frames"] = "Input/Output";
+            switches["frame-threads"] = "Performance";
+            switches["gop-lookahead"] = "Slice Decision";
+            switches["hash"] = "Bitstream";
+            switches["hdr"] = "VUI";
+            switches["hdr-opt"] = "VUI";
+            switches["hevc-aq"] = "Analysis";
+            switches["high-tier"] = "Other";
+            switches["hme"] = "Motion Search";
+            switches["hme-search"] = "Motion Search";
+            switches["hrd"] = "Bitstream";
+            switches["hrd-concat"] = "Bitstream";
+            switches["idr-recovery-sei"] = "Bitstream";
+            switches["info"] = "Bitstream";
+            switches["input-csp"] = "Input/Output";
+            switches["input-depth"] = "Input/Output";
+            switches["interlace"] = "Input/Output";
+            switches["intra-refresh"] = "Slice Decision";
+            switches["ip-factor"] = "Rate Control";
+            switches["ipratio"] = "Rate Control";
+            switches["keyint"] = "Slice Decision";
+            switches["lambda-file"] = "Other";
+            switches["limit-modes"] = "Analysis";
+            switches["limit-refs"] = "Analysis";
+            switches["limit-sao"] = "Loop Filter";
+            switches["limit-tu"] = "Analysis";
+            switches["log"] = "Statistic";
+            switches["log2-max-poc-lsb"] = "Bitstream";
+            switches["log-level"] = "Statistic";
+            switches["lookahead-slices"] = "Slice Decision";
+            switches["lookahead-threads"] = "Slice Decision";
+            switches["lossless"] = "Rate Control";
+            switches["lowpass-dct"] = "Other";
+            switches["master-display"] = "VUI";
+            switches["max-ausize-factor"] = "Other";
+            switches["max-cll"] = "VUI";
+            switches["max-luma"] = "VUI";
+            switches["max-merge"] = "Motion Search";
+            switches["max-tu-size"] = "Analysis";
+            switches["me"] = "Motion Search";
+            switches["merange"] = "Motion Search";
+            switches["min-cu-size"] = "Analysis";
+            switches["min-keyint"] = "Slice Decision";
+            switches["min-luma"] = "VUI";
+            switches["multi-pass-opt-analysis"] = "Rate Control";
+            switches["multi-pass-opt-distortion"] = "Rate Control";
+            switches["multi-pass-opt-rps"] = "Bitstream";
+            switches["nalu-file"] = "VUI";
+            switches["no-amp"] = "Analysis";
+            switches["no-analyze-src-pics"] = "Motion Search";
+            switches["no-asm"] = "Performance";
+            switches["no-b-intra"] = "Analysis";
+            switches["no-b-pyramid"] = "Slice Decision";
+            switches["no-cll"] = "VUI";
+            switches["no-constrained-intra"] = "Other";
+            switches["no-const-vbv"] = "Rate Control";
+            switches["no-copy-pic"] = "Performance";
+            switches["no-cutree"] = "Rate Control";
+            switches["no-early-skip"] = "Analysis";
+            switches["no-fast-intra"] = "Analysis";
+            switches["no-field"] = "Input/Output";
+            switches["no-hme"] = "Motion Search";
+            switches["no-info"] = "Bitstream";
+            switches["no-open-gop"] = "Slice Decision";
+            switches["no-pme"] = "Performance";
+            switches["no-pmode"] = "Performance";
+            switches["no-rc-grain"] = "Rate Control";
+            switches["no-rect"] = "Analysis";
+            switches["no-rskip"] = "Analysis";
+            switches["no-sao"] = "Loop Filter";
+            switches["no-signhide"] = "Other";
+            switches["no-slow-firstpass"] = "Performance";
+            switches["no-strong-intra-smoothing"] = "Other";
+            switches["no-temporal-mvp"] = "Motion Search";
+            switches["no-weightb"] = "Motion Search";
+            switches["no-weightp"] = "Motion Search";
+            switches["no-wpp"] = "Performance";
+            switches["nr-inter"] = "Rate Control";
+            switches["nr-intra"] = "Rate Control";
+            switches["numa-pools"] = "Performance";
+            switches["open-gop"] = "Slice Decision";
+            switches["opt-cu-delta-qp"] = "Bitstream";
+            switches["opt-qp-pps"] = "Bitstream";
+            switches["opt-ref-list-length-pps"] = "Bitstream";
+            switches["overscan"] = "VUI";
+            switches["pb-factor"] = "Rate Control";
+            switches["pbratio"] = "Rate Control";
+            switches["pic-struct"] = "VUI";
+            switches["pme"] = "Performance";
+            switches["pmode"] = "Performance";
+            switches["pools"] = "Performance";
+            switches["psnr"] = "Statistic";
+            switches["psy-rd"] = "Other";
+            switches["psy-rdoq"] = "Analysis";
+            switches["qblur"] = "Rate Control";
+            switches["qcomp"] = "Rate Control";
+            switches["qg-size"] = "Rate Control";
+            switches["qp-adaptation-range"] = "Analysis";
+            switches["qpfile"] = "Other";
+            switches["qpmax"] = "Rate Control";
+            switches["qpmin"] = "Rate Control";
+            switches["qpstep"] = "Rate Control";
+            switches["radl"] = "Slice Decision";
+            switches["range"] = "VUI";
+            switches["rc-grain"] = "Rate Control";
+            switches["rc-lookahead"] = "Slice Decision";
+            switches["rd"] = "Analysis";
+            switches["rdoq"] = "Analysis";
+            switches["rdoq-level"] = "Analysis";
+            switches["rdpenalty"] = "Other";
+            switches["rd-refine"] = "Analysis";
+            switches["recon"] = "Other";
+            switches["recon-depth"] = "Other";
+            switches["rect"] = "Analysis";
+            switches["ref"] = "Slice Decision";
+            switches["refine-analysis-type"] = "Slice Decision";
+            switches["refine-ctu-distortion"] = "Analysis";
+            switches["refine-inter"] = "Analysis";
+            switches["refine-intra"] = "Analysis";
+            switches["refine-mv"] = "Analysis";
+            switches["repeat-headers"] = "Bitstream";
+            switches["rskip"] = "Analysis";
+            switches["sao"] = "Loop Filter";
+            switches["sao-non-deblock"] = "Loop Filter";
+            switches["sar"] = "VUI";
+            switches["scale-factor"] = "Analysis";
+            switches["scaling-list"] = "Other";
+            switches["scenecut"] = "Slice Decision";
+            switches["scenecut-bias"] = "Slice Decision";
+            switches["seek"] = "Input/Output";
+            switches["selective-sao"] = "Loop Filter";
+            switches["signhide"] = "Other";
+            switches["single-sei"] = "Bitstream";
+            switches["slices"] = "Performance";
+            switches["slow-firstpass"] = "Performance";
+            switches["splitrd-skip"] = "Analysis";
+            switches["ssim"] = "Statistic";
+            switches["ssim-rd"] = "Analysis";
+            switches["strict-cbr"] = "Rate Control";
+            switches["strong-intra-smoothing"] = "Other";
+            switches["subme"] = "Motion Search";
+            switches["temporal-layers"] = "Bitstream";
+            switches["temporal-mvp"] = "Motion Search";
+            switches["transfer"] = "VUI";
+            switches["tskip"] = "Analysis";
+            switches["tskip-fast"] = "Analysis";
+            switches["tu-inter-depth"] = "Analysis";
+            switches["tu-intra-depth"] = "Analysis";
+            switches["uhd-bd"] = "Other";
+            switches["vbv-bufsize"] = "Rate Control";
+            switches["vbv-end"] = "Rate Control";
+            switches["vbv-end-fr-adj"] = "Rate Control";
+            switches["vbv-init"] = "Rate Control";
+            switches["vbv-maxrate"] = "Rate Control";
+            switches["videoformat"] = "VUI";
+            switches["vui-hrd-info"] = "Bitstream";
+            switches["vui-timing-info"] = "Bitstream";
+            switches["weightb"] = "Motion Search";
+            switches["weightp"] = "Motion Search";
+            switches["wpp"] = "Performance";
+            switches["zonefile"] = "Rate Control";
+            switches["zones"] = "Rate Control";
+
+            Dictionary<string, List<string>> groups = new Dictionary<string, List<string>>();
+
+            foreach (var pair in switches)
+            {
+                if (!groups.ContainsKey(pair.Value))
+                    groups[pair.Value] = new List<string>();
+
+                if (!groups[pair.Value].Contains(pair.Key))
+                    groups[pair.Value].Add(pair.Key);
+            }
+
+            List<KeyValuePair<string, List<string>>> list = new List<KeyValuePair<string, List<string>>>();
+
+            list.Add(new KeyValuePair<string, List<string>>("Analysis", new List<string>()));
+            list.Add(new KeyValuePair<string, List<string>>("Rate Control", new List<string>()));
+            list.Add(new KeyValuePair<string, List<string>>("Slice Decision", new List<string>()));
+            list.Add(new KeyValuePair<string, List<string>>("Motion Search", new List<string>()));
+            list.Add(new KeyValuePair<string, List<string>>("Performance", new List<string>()));
+            list.Add(new KeyValuePair<string, List<string>>("Bitstream", new List<string>()));
+            list.Add(new KeyValuePair<string, List<string>>("VUI", new List<string>()));
+            list.Add(new KeyValuePair<string, List<string>>("Statistic", new List<string>()));
+            list.Add(new KeyValuePair<string, List<string>>("Loop Filter", new List<string>()));
+            list.Add(new KeyValuePair<string, List<string>>("Input/Output", new List<string>()));
+            list.Add(new KeyValuePair<string, List<string>>("Other", new List<string>()));
+
+            foreach (string _switch in item.Value.Split(" / "))
+            {
+                string name = _switch;
+
+                if (name.Contains("="))
+                    name = name.Substring(0, name.IndexOf("=")).Trim();
+
+                string group = "Other";
+
+                foreach (var groupPair in groups)
+                {
+                    if (groupPair.Value.Contains(name))
+                    {
+                        group = groupPair.Key;
+                        break;
+                    }
+                }
+
+                foreach (var i in list)
+                {
+                    if (i.Key == group)
+                    {
+                        i.Value.Add(_switch);
+                        break;
+                    }
+                }
+            }
+
+            string text = "\r\n";
+
+            foreach (var i in list)
+            {
+                if (i.Value.Count == 0)
+                    continue;
+
+                text += "\r\n    " + i.Key + "\r\n";
+
+                string temp = "";
+                
+                foreach (var i2 in i.Value)
+                {
+                    temp += " / " + i2;
+
+                    if (temp.Length > 40)
+                    {
+                        text += "        " + temp.Trim(" /".ToCharArray()) + "\r\n";
+                        temp = "";
+                    }
+                }
+
+                if (temp != "")
+                    text += "        " + temp.Trim(" /".ToCharArray()) + "\r\n";
+            }
+
+            item.Value = text;
+        }
+
+        private void OpenFileMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFile();
+        }
+
+        void OpenFile()
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+
+            if (dialog.ShowDialog() == true)
+                LoadFile(dialog.FileName);
         }
     }
 }
