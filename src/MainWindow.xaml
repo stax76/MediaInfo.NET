@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         
-        KeyDown="Window_KeyDown"
+        Background="#1E1E1E"
         AllowDrop="True"
         Drop="Window_Drop"
-        PreviewDragOver="Window_PreviewDragOver"
-        Background="#1E1E1E">
+        KeyDown="Window_KeyDown"
+        PreviewDragOver="Window_PreviewDragOver">
 
     <Grid FocusManager.FocusedElement="{Binding ElementName=SearchTextBox}">
         <Grid.RowDefinitions>
@@ -107,19 +107,22 @@
                          BorderThickness="0"
                          Padding="10"
                          AllowDrop="True"
-                         Drop="ContentTextBox_Drop"
-                         PreviewDragOver="ContentTextBox_PreviewDragOver">
+                         Drop="ContentRichTextBox_Drop"
+                         SelectionChanged="ContentRichTextBox_SelectionChanged"
+                         PreviewDragOver="ContentRichTextBox_PreviewDragOver">
 
                 <RichTextBox.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Name="OpenFileMenuItem" Header="Open File..." InputGestureText="Ctrl+O" Click="OpenFileMenuItem_Click" />
-                        <MenuItem Name="CopyMenuItem"     Header="Copy" InputGestureText="Ctrl+C" IsEnabled="False" Click="CopyMenuItem_Click" />
+                        <MenuItem Name="OpenFileMenuItem" Header="Open File..."  InputGestureText="Ctrl+O" Click="OpenFileMenuItem_Click" />
+                        <MenuItem Name="SaveMenuItem"     Header="Save File..."  InputGestureText="Ctrl+S" IsEnabled="False" Click="SaveMenuItem_Click" />
+                        <MenuItem Name="CopyMenuItem"     Header="Copy"          InputGestureText="Ctrl+C" IsEnabled="False" Click="CopyMenuItem_Click" />
                         <Separator />
-                        <MenuItem Name="PreviousMenuItem" Header="Previous" InputGestureText="F11" IsEnabled="False" Click="PreviousMenuItem_Click" />
-                        <MenuItem Name="NextMenuItem"     Header="Next"     InputGestureText="F12" IsEnabled="False" Click="NextMenuItem_Click" />
+                        <MenuItem Name="PreviousMenuItem" Header="Previous File" InputGestureText="F11" IsEnabled="False" Click="PreviousMenuItem_Click" />
+                        <MenuItem Name="NextMenuItem"     Header="Next File"     InputGestureText="F12" IsEnabled="False" Click="NextMenuItem_Click" />
                         <Separator />
                         <MenuItem Name="SetupMenuItem"    Header="Install/Uninstall" Click="SetupMenuItem_Click" />
-                        <MenuItem Name="SettingsMenuItem" Header="Settings..." Click="SettingsMenuItem_Click" />
+                        <MenuItem Name="SettingsMenuItem" Header="Settings..."       Click="SettingsMenuItem_Click" />
+                        <MenuItem Name="AboutMenuItem"    Header="About..."          Click="AboutMenuItem_Click" />
                     </ContextMenu>
                 </RichTextBox.ContextMenu>
             </RichTextBox>

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using MediaInfoNET;
+using WinForms = System.Windows.Forms;
 
 public class Program
 {
@@ -10,6 +12,40 @@ public class Program
     {
         try
         {
+            if (!File.Exists(App.SettingsFile))
+            {
+                using TaskDialog<string> td = new TaskDialog<string>();
+                td.MainInstruction = "Choose a settings directory.";
+                td.AddCommandLink("AppData");
+                td.AddCommandLink("Portable");
+                td.AddCommandLink("Custom");
+                td.AddCommandLink("Cancel");
+                td.Show();
+
+                if (string.IsNullOrEmpty(td.SelectedValue) || td.SelectedValue == "Cancel")
+                    return;
+
+                switch (td.SelectedValue)
+                {
+                    case "AppData":
+                        App.SettingsFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+                            + "\\" + AppHelp.ProductName + "\\Settings.xml";
+                        break;
+                    case "Portable":
+                        App.SettingsFile = WinForms.Application.StartupPath + "\\Settings.xml";
+                        break;
+                    case "Custom":
+                        using (WinForms.FolderBrowserDialog dialog = new WinForms.FolderBrowserDialog())
+                        {
+                            if (dialog.ShowDialog() == WinForms.DialogResult.OK)
+                                App.SettingsFile = dialog.SelectedPath + "\\Settings.xml";
+                            else
+                                return;
+                        }
+                        break;
+                }
+            }
+
             if (args.Length == 1 && (args[0] == "--install" || args[0] == "--uninstall"))
                 Setup(args[0] == "--install");
             else
@@ -17,17 +53,13 @@ public class Program
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(ex.Message, AppHelp.ProductName + " Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
     static void Setup(bool install)
     {
-        string[] extensions = (
-            "mpg avi vob mp4 mkv 264 mov wmv flv h264 asf webm mpeg mpv avc hevc 265 h265 m2v m2ts mts webm ts m4v " +
-            "mp2 mp3 ac3 wav w64 m4a dts dtsma dtshr dtshd eac3 thd ogg mka aac opus flac mpa " +
-            "sub sup idx ass aas srt " +
-            "png jpg jpeg gif bmp").Split(' ');
+        string[] extensions = App.Settings.FileTypes.Split(" \r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
         if (install)
         {
@@ -35,16 +67,16 @@ public class Program
 
             foreach (string ext in extensions)
             {
-                string filekeyName = RegHelp.GetString(@"HKCR\." + ext, null);
+                string filekeyName = RegistryHelp.GetString(@"HKCR\." + ext, null);
 
                 if (filekeyName == "")
                 {
-                    RegHelp.SetValue(@"HKCR\." + ext, null, ext + "file");
+                    RegistryHelp.SetValue(@"HKCR\." + ext, null, ext + "file");
                     filekeyName = ext + "file";
                 }
 
-                RegHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET", null, "MediaInfo");
-                RegHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET\command", null, $"\"{exePath}\" \"%1\"");
+                RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET", null, "MediaInfo");
+                RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET\command", null, $"\"{exePath}\" \"%1\"");
             }
 
             MessageBox.Show("Install complete", "Install", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -52,7 +84,7 @@ public class Program
         else
         {
             foreach (string ext in extensions)
-                RegHelp.RemoveKey(@"HKCR\" + RegHelp.GetString(@"HKCR\." + ext, null) + @"\shell\MediaInfo.NET");
+                RegistryHelp.RemoveKey(@"HKCR\" + RegistryHelp.GetString(@"HKCR\." + ext, null) + @"\shell\MediaInfo.NET");
 
             MessageBox.Show("Uninstall complete", "Uninstall", MessageBoxButton.OK, MessageBoxImage.Information);
         }

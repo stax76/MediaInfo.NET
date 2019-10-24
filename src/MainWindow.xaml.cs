@@ -5,54 +5,26 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using WinForms = System.Windows.Forms;
 
 namespace MediaInfoNET
 {
     public partial class MainWindow : Window
     {
-        bool Wrap;
-        string SettingsFolder = "";
-        string SettingsFile = "";
         string SourcePath = "";
         String ActiveGroup = "";
-        List<Item> Items = new List<Item>();
-        string[] Exclude = {};
+        List<MediaInfoParameter> Items = new List<MediaInfoParameter>();
 
         public MainWindow()
         {
             InitializeComponent();
-
-            ContentRichTextBox.SelectionChanged += ContentTextBox_SelectionChanged;
-         
-            SettingsFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" +
-                FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location).ProductName + @"\";
-            
-            SettingsFile = SettingsFolder + "settings.conf";
-
-            if (!Directory.Exists(SettingsFolder))
-                Directory.CreateDirectory(SettingsFolder);
-
-            if (!File.Exists(SettingsFile))
-            {
-                string content = @"font = consolas
-font-size = 14
-window-width = 750
-window-height = 550
-center-screen = yes
-raw-view = yes
-word-wrap = no
-exclude = UniqueID/String";
-                File.WriteAllText(SettingsFile, content);
-            }
-
-            ReadSettings();
+            ApplySettings();
 
             if (Environment.GetCommandLineArgs().Length > 1)
                 LoadFile(Environment.GetCommandLineArgs()[1]);
@@ -60,36 +32,14 @@ exclude = UniqueID/String";
                 SetText("Drag files here or right-click.");
         }
 
-        void ReadSettings()
+        void ApplySettings()
         {
-            foreach (string line in File.ReadAllLines(SettingsFile))
-            {
-                if (!line.Contains("="))
-                    continue;
-
-                string left = line.Substring(0, line.IndexOf("=")).Trim();
-                string right = line.Substring(line.IndexOf("=") + 1).Trim();
-
-                try
-                {
-                    switch (left)
-                    {
-                        case "font": FontFamily = new FontFamily(right); break;
-                        case "font-size": FontSize = int.Parse(right); break;
-                        case "window-width": Width = int.Parse(right); break;
-                        case "window-height": Height = int.Parse(right); break;
-                        case "raw-view": MediaInfo.RawView = right == "yes"; break;
-                        case "word-wrap": Wrap = right == "yes"; break;
-                        case "center-screen": WindowStartupLocation = right == "yes" ? WindowStartupLocation.CenterScreen : WindowStartupLocation.Manual; break;
-                        case "exclude": Exclude = right.Split(new[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries); break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Failed to read setting " + left + "." + "\n\n" + ex.Message,
-                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
+            MediaInfo.RawView = App.Settings.RawView;
+            FontFamily = new FontFamily(App.Settings?.FontName);
+            FontSize = App.Settings.FontSize;
+            Width = App.Settings.WindowWidth;
+            Height = App.Settings.WindowHeight;
+            WindowStartupLocation = App.Settings.CenterScreen ? WindowStartupLocation.CenterScreen : WindowStartupLocation.Manual;
         }
 
         void LoadFile(string file)
@@ -97,11 +47,11 @@ exclude = UniqueID/String";
             if (!File.Exists(file))
                 return;
 
+            SaveMenuItem.IsEnabled = true;
             PreviousMenuItem.IsEnabled = Directory.GetFiles(Path.GetDirectoryName(file)).Length > 1;
             NextMenuItem.IsEnabled = PreviousMenuItem.IsEnabled;
             SourcePath = file;
-            Title = file + " - " + FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location).ProductName +
-                " " + FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location).FileVersion;
+            Title = file + " - " + AppHelp.ProductName + " " + WinForms.Application.ProductVersion;
             List<TabItem> tabItems = new List<TabItem>();
             tabItems.Clear();
             HashSet<string> captionNames = new HashSet<string>();
@@ -109,14 +59,14 @@ exclude = UniqueID/String";
             captionNames.Add("Advanced");
             Items = GetItems();
 
-            foreach (Item item in Items)
+            foreach (MediaInfoParameter item in Items)
                 captionNames.Add(item.Group);
 
             foreach (string name in captionNames)
                 tabItems.Add(new TabItem { Name = name, Value = name });
 
             foreach (TabItem tabItem in tabItems)
-                foreach (Item item in Items)
+                foreach (MediaInfoParameter item in Items)
                     if (item.Group == tabItem.Name && item.Name == "Format")
                         tabItem.Name += " (" + item.Value + ")";
 
@@ -134,21 +84,26 @@ exclude = UniqueID/String";
             public string Value { get; set; } = "";
         }
 
-        List<Item> GetItems()
+        List<MediaInfoParameter> GetItems()
         {
-            List<Item> items = new List<Item>();
+            List<MediaInfoParameter> items = new List<MediaInfoParameter>();
             using MediaInfo mediaInfo = new MediaInfo(SourcePath);
             string summary = mediaInfo.GetSummary(true);
             string group = "";
+            string[] exclude = App.Settings.Exclude.Split(new[] { '\r', '\n' },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < exclude.Length; i++)
+                exclude[i] = exclude[i].Trim();
 
             foreach (string line in summary.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (line.Contains(":"))
                 {
-                    Item item = new Item();
+                    MediaInfoParameter item = new MediaInfoParameter();
                     item.Name = line.Substring(0, line.IndexOf(":")).Trim();
 
-                    if (Exclude.Contains(item.Name))
+                    if (exclude.Contains(item.Name))
                         continue;
 
                     item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
@@ -167,8 +122,12 @@ exclude = UniqueID/String";
             {
                 if (line.Contains(":"))
                 {
-                    Item item = new Item();
+                    MediaInfoParameter item = new MediaInfoParameter();
                     item.Name = line.Substring(0, line.IndexOf(":")).Trim();
+
+                    if (exclude.Contains(item.Name))
+                        continue;
+
                     item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
                     item.Group = group;
                     Fix(item);
@@ -181,7 +140,7 @@ exclude = UniqueID/String";
             return items;
         }
 
-        void Fix(Item item)
+        void Fix(MediaInfoParameter item)
         {
             if (item.Name.StartsWith("FrameRate/"))
             {
@@ -207,15 +166,18 @@ exclude = UniqueID/String";
             }
             else if (item.Name.StartsWith("BitDepth/") && item.Value.Contains("bit3"))
                 item.Value = item.Value.Replace("bit3", "bits");
-            else if (item.Name == "Encoded_Library_Settings")
+            else if ((item.Name == "Encoded_Library_Settings" || item.Name == "Encoding settings")
+                && App.Settings.FormatEncoded)
+                
                 Format_Encoded_Library_Settings(item);
         }
 
         string GetValue(string group, string name)
         {
-            foreach (Item item in Items)
+            foreach (MediaInfoParameter item in Items)
                 if (item.Group == group && item.Name == name)
                     return item.Value;
+
             return "";
         }
 
@@ -233,9 +195,9 @@ exclude = UniqueID/String";
         void UpdateItems()
         {
             StringBuilder sb = new StringBuilder();
-            IEnumerable<Item> items;
+            IEnumerable<MediaInfoParameter> items;
 
-            if (ActiveGroup == "Basic")
+            if (ActiveGroup == "Basic" && App.Settings.ShowCompactSummary && App.Settings.RawView)
             {
                 List<string> values = new List<string>();
 
@@ -321,9 +283,9 @@ exclude = UniqueID/String";
                 items = Items.Where(i => !i.IsComplete);
             else
             {
-                var newItems = new List<Item>();
+                var newItems = new List<MediaInfoParameter>();
                 newItems.AddRange(Items.Where(i => !i.IsComplete && i.Group == ActiveGroup));
-                newItems.Add(new Item { Name = "", Value = "", Group = ActiveGroup });
+                newItems.Add(new MediaInfoParameter { Name = "", Value = "", Group = ActiveGroup });
                 newItems.AddRange(Items.Where(i => i.IsComplete && i.Group == ActiveGroup));
                 items = newItems;
             }
@@ -335,7 +297,7 @@ exclude = UniqueID/String";
 
             List<string> groups = new List<string>();
 
-            foreach (Item item in items)
+            foreach (MediaInfoParameter item in items)
                 if (item.Group != "" && !groups.Contains(item.Group))
                     groups.Add(item.Group);
 
@@ -348,11 +310,11 @@ exclude = UniqueID/String";
 
                 var itemsInGroup = items.Where(i => i.Group == group);
 
-                foreach (Item item in itemsInGroup)
+                foreach (MediaInfoParameter item in itemsInGroup)
                 {
                     if (item.Name != "")
                     {
-                        sb.Append(item.Name.PadRight(30));
+                        sb.Append(item.Name.PadRight(App.Settings.ColumnPadding));
                         sb.Append(": ");
                     }
 
@@ -364,7 +326,7 @@ exclude = UniqueID/String";
             string text = sb.ToString();
             SetText(text);
 
-            if (Wrap)
+            if (App.Settings.WordWrap)
                 ContentRichTextBox.Document.PageWidth = ContentRichTextBox.Width;
             else
             {          
@@ -453,17 +415,10 @@ exclude = UniqueID/String";
         void ShowSettings()
         {
             SettingsWindow window = new SettingsWindow();
-            window.ShowInTaskbar = false;
             window.Owner = this;
-            window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            window.FontFamily = FontFamily;
-            window.FontSize = 20;
-            window.TextBox.Background = ContentRichTextBox.Background;
-            window.TextBox.Foreground = ContentRichTextBox.Foreground;
-            window.TextBox.Text = File.ReadAllText(SettingsFile);
             window.ShowDialog();
-            File.WriteAllText(SettingsFile, window.TextBox.Text);
-            ReadSettings();
+            ApplySettings();
+            App.SaveSettings();
             LoadFile(SourcePath);
         }
 
@@ -481,7 +436,7 @@ exclude = UniqueID/String";
             Clipboard.SetText(ContentRichTextBox.Selection.Text);
         }
 
-        void ContentTextBox_SelectionChanged(object sender, RoutedEventArgs e)
+        void ContentRichTextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             CopyMenuItem.IsEnabled = ContentRichTextBox.Selection.Text.Length > 0;
         }
@@ -514,12 +469,14 @@ exclude = UniqueID/String";
                 case Key.F11: Previous(); break;
                 case Key.F12: Next(); break;
                 case Key.O when Keyboard.IsKeyDown(Key.LeftCtrl):
+                    e.Handled = true;
                     OpenFile();
                     break;
+                case Key.S when Keyboard.IsKeyDown(Key.LeftCtrl):
+                    e.Handled = true;
+                    SaveFile();
+                    break;
             }
-
-            if (Keyboard.IsKeyDown(Key.LeftCtrl))
-                e.Handled = true;
         }
 
         void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -546,7 +503,7 @@ exclude = UniqueID/String";
             HandleDrop(e);
         }
 
-        void ContentTextBox_Drop(object sender, DragEventArgs e)
+        void ContentRichTextBox_Drop(object sender, DragEventArgs e)
         {
             HandleDrop(e);
         }
@@ -560,7 +517,7 @@ exclude = UniqueID/String";
             }
         }
 
-        void ContentTextBox_PreviewDragOver(object sender, DragEventArgs e)
+        void ContentRichTextBox_PreviewDragOver(object sender, DragEventArgs e)
         {
             e.Effects = DragDropEffects.All;
             e.Handled = true;
@@ -574,30 +531,29 @@ exclude = UniqueID/String";
 
         void SetupMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Click yes to install and no to uninstall.",
-                "Setup", MessageBoxButton.YesNoCancel);
+            using TaskDialog<string> td = new TaskDialog<string>();
+            td.MainInstruction = "Register or unregister file associations?";
+            td.Content = "Add/remove MediaInfo.NET in File Explorer context menu.";
+            td.AddCommandLink("Register file associations", "--install");
+            td.AddCommandLink("Unregister file associations", "--uninstall");
+            td.AddCommandLink("Cancel");
+            td.Show();
 
-            string args = result switch {
-                MessageBoxResult.Yes => "--install",
-                MessageBoxResult.No => "--uninstall",
-                _ => ""
-            };
-
-            if (args != "")
+            if ((td.SelectedValue ?? "").StartsWith("--"))
             {
                 try
                 {
                     using Process proc = new Process();
                     proc.StartInfo.UseShellExecute = true;
                     proc.StartInfo.FileName = Process.GetCurrentProcess().MainModule.FileName;
-                    proc.StartInfo.Arguments = args;
+                    proc.StartInfo.Arguments = td.SelectedValue;
                     proc.StartInfo.Verb = "runas";
                     proc.Start();
                 } catch {}
             }
         }
 
-        void Format_Encoded_Library_Settings(Item item)
+        void Format_Encoded_Library_Settings(MediaInfoParameter item)
         {
             Dictionary<string, string> switches = new Dictionary<string, string>();
 
@@ -913,6 +869,36 @@ exclude = UniqueID/String";
 
             if (dialog.ShowDialog() == true)
                 LoadFile(dialog.FileName);
+        }
+
+        private void SaveMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFile();
+        }
+
+        private void SaveFile()
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+
+            if (dialog.ShowDialog() == true)
+            {
+                if (!dialog.FileName.EndsWith(".txt"))
+                    dialog.FileName += ".txt";
+
+                File.WriteAllText(dialog.FileName, GetText());
+            }
+        }
+
+        string GetText()
+        {
+            return new TextRange(ContentRichTextBox.Document.ContentStart,
+                ContentRichTextBox.Document.ContentEnd).Text;
+        }
+
+        private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Msg.Show(AppHelp.ProductName + " " + WinForms.Application.ProductVersion,
+                "Copyright © 2008-2019 Frank Skare (stax76)\n\nMIT License");
         }
     }
 }

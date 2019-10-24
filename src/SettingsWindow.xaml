@@ -6,16 +6,89 @@
         mc:Ignorable="d"
         
         Title="Settings"
-        Height="250"
-        Width="300"
+        Height="490"
+        Width="550"
+        FontSize="14"
+        Background="LightGray"
+        WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        SizeToContent="WidthAndHeight"
-        KeyDown="Window_KeyDown">
+        PreviewKeyDown="SettingsWindow_PreviewKeyDown"
+        ShowInTaskbar="False">
 
     <Grid>
-        <TextBox Name="MainTextBox"
-                 TextWrapping="Wrap"
-                 AcceptsReturn="True"
-                 Padding="10"/>
+        <StackPanel Margin="20">
+            <CheckBox Name="RawViewCheckBox"
+                      IsChecked="{Binding RawView}"
+                      Margin="5">Show parameter names as they are used in the MediaInfo API</CheckBox>
+            <CheckBox IsChecked="{Binding ShowCompactSummary}"
+                      IsEnabled="{Binding IsChecked, ElementName=RawViewCheckBox}"
+                      Margin="30 5 5 5">Show compact summary on top of basic tab</CheckBox>
+            <CheckBox IsChecked="{Binding WordWrap}" Margin="5">Word Wrap</CheckBox>
+            <CheckBox IsChecked="{Binding CenterScreen}" Margin="5">Start app in center of screen</CheckBox>
+            <CheckBox IsChecked="{Binding FormatEncoded}" Margin="5">Show special presentation of encoding settings</CheckBox>
+
+            <StackPanel Orientation="Horizontal">
+                <Label VerticalAlignment="Center" Width="110">Font:</Label>
+                <TextBox Name="FontTextBox"
+                         Text="{Binding FontName}"
+                         VerticalContentAlignment="Center"
+                         HorizontalContentAlignment="Center"
+                         Width="130"
+                         Height="25"/>
+                <TextBox Name="FontSizeTextBox"
+                         Text="{Binding FontSize}"
+                         VerticalContentAlignment="Center"
+                         HorizontalContentAlignment="Center"
+                         Margin="5 0 0 0"
+                         Width="40"
+                         Height="25"/>
+                <Button Name="FontButton"
+                        Width="30"
+                        Height="25"
+                        Margin="5 0 0 0"
+                        Click="FontButton_Click">...</Button>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Label VerticalAlignment="Center" Width="110">Column Width:</Label>
+                <TextBox Text="{Binding ColumnPadding}"
+                         VerticalContentAlignment="Center"
+                         HorizontalContentAlignment="Center"
+                         Width="50"
+                         Height="25"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Label VerticalAlignment="Center" Width="110">Window Size:</Label>
+                <TextBox Text="{Binding WindowWidth}"
+                         VerticalContentAlignment="Center"
+                         HorizontalContentAlignment="Center"
+                         Width="50"
+                         Height="25"/>
+                <Label VerticalAlignment="Center">x</Label>
+                <TextBox Text="{Binding WindowHeight}"
+                         VerticalContentAlignment="Center"
+                         HorizontalContentAlignment="Center"
+                         Width="50"
+                         Height="25"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Label Width="110"
+                       xml:space="preserve">Parameters&#10;to hide (one&#10;per line):</Label>
+                <TextBox Text="{Binding Exclude}"
+                         AcceptsReturn="True"
+                         Width="250"
+                         Height="65"
+                         Margin="0 2 0 0"/>               
+            </StackPanel>
+           
+            <Label>File Types to install:</Label>           
+            <TextBox Text="{Binding FileTypes}"
+                     TextWrapping="Wrap"
+                     Height="85"
+                     HorizontalAlignment="Stretch"
+                     Margin="0 3 0 0"/>
+        </StackPanel>
     </Grid>
 </Window>
