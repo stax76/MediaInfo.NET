@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -20,6 +21,7 @@ namespace MediaInfoNET
         string SourcePath = "";
         String ActiveGroup = "";
         List<MediaInfoParameter> Items = new List<MediaInfoParameter>();
+        List<MediaInfoParameter> ItemsRaw = new List<MediaInfoParameter>();
 
         public MainWindow()
         {
@@ -34,7 +36,6 @@ namespace MediaInfoNET
 
         void ApplySettings()
         {
-            MediaInfo.RawView = App.Settings.RawView;
             FontFamily = new FontFamily(App.Settings?.FontName);
             FontSize = App.Settings.FontSize;
             Width = App.Settings.WindowWidth;
@@ -57,7 +58,8 @@ namespace MediaInfoNET
             HashSet<string> captionNames = new HashSet<string>();
             captionNames.Add("Basic");
             captionNames.Add("Advanced");
-            Items = GetItems();
+            Items = GetItems(App.Settings.RawView);
+            ItemsRaw = GetItems(true);
 
             foreach (MediaInfoParameter item in Items)
                 captionNames.Add(item.Group);
@@ -84,11 +86,11 @@ namespace MediaInfoNET
             public string Value { get; set; } = "";
         }
 
-        List<MediaInfoParameter> GetItems()
+        List<MediaInfoParameter> GetItems(bool rawView)
         {
             List<MediaInfoParameter> items = new List<MediaInfoParameter>();
             using MediaInfo mediaInfo = new MediaInfo(SourcePath);
-            string summary = mediaInfo.GetSummary(true);
+            string summary = mediaInfo.GetSummary(true, rawView);
             string group = "";
             string[] exclude = App.Settings.Exclude.Split(new[] { '\r', '\n' },
                 StringSplitOptions.RemoveEmptyEntries);
@@ -116,7 +118,7 @@ namespace MediaInfoNET
                     group = line.Trim();
             }
 
-            summary = mediaInfo.GetSummary(false);
+            summary = mediaInfo.GetSummary(false, rawView);
 
             foreach (string line in summary.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
             {
@@ -174,7 +176,7 @@ namespace MediaInfoNET
 
         string GetValue(string group, string name)
         {
-            foreach (MediaInfoParameter item in Items)
+            foreach (var item in ItemsRaw)
                 if (item.Group == group && item.Name == name)
                     return item.Value;
 
@@ -192,12 +194,12 @@ namespace MediaInfoNET
             return string.Join(", ", newList.ToArray());
         }
 
-        void UpdateItems()
+        void UpdateContentRichTextBox()
         {
             StringBuilder sb = new StringBuilder();
             IEnumerable<MediaInfoParameter> items;
 
-            if (ActiveGroup == "Basic" && App.Settings.ShowCompactSummary && App.Settings.RawView)
+            if (ActiveGroup == "Basic" && App.Settings.ShowCompactSummary)
             {
                 List<string> values = new List<string>();
 
@@ -427,7 +429,7 @@ namespace MediaInfoNET
             if (TabListBox.SelectedItem != null)
                 ActiveGroup = (TabListBox.SelectedItem as TabItem)?.Value ?? "";
 
-            UpdateItems();
+            UpdateContentRichTextBox();
             ContentRichTextBox.ScrollToHome();
         }
 
@@ -488,7 +490,7 @@ namespace MediaInfoNET
             if (TabListBox.Items.Count > 1)
             {
                 TabListBox.SelectedIndex = 1;
-                UpdateItems();
+                UpdateContentRichTextBox();
             }
         }
 
@@ -555,294 +557,273 @@ namespace MediaInfoNET
 
         void Format_Encoded_Library_Settings(MediaInfoParameter item)
         {
-            Dictionary<string, string> switches = new Dictionary<string, string>();
+            OrderedDictionary switches = new OrderedDictionary();
 
-            switches["allow-non-conformance"] = "Other";
-            switches["amp"] = "Analysis";
-            switches["analysis-load"] = "Analysis";
-            switches["analysis-reuse-file"] = "Analysis";
-            switches["analysis-reuse-level"] = "Analysis";
-            switches["analysis-save"] = "Analysis";
-            switches["analyze-src-pics"] = "Motion Search";
             switches["aq-mode"] = "Rate Control";
             switches["aq-motion"] = "Rate Control";
             switches["aq-strength"] = "Rate Control";
-            switches["asm avx512"] = "Performance";
-            switches["asm"] = "Performance";
-            switches["atc-sei"] = "VUI";
-            switches["aud"] = "Bitstream";
-            switches["b-adapt"] = "Slice Decision";
-            switches["bframe-bias"] = "Slice Decision";
-            switches["bframes"] = "Slice Decision";
-            switches["b-intra"] = "Analysis";
-            switches["b-pyramid"] = "Slice Decision";
+            switches["bitrate"] = "Rate Control";
             switches["cbqpoffs"] = "Rate Control";
-            switches["chromaloc"] = "VUI";
-            switches["chunk-end"] = "Input/Output";
-            switches["chunk-start"] = "Input/Output";
-            switches["cip"] = "Other";
-            switches["cll"] = "VUI";
-            switches["colormatrix"] = "VUI";
-            switches["colorprim"] = "VUI";
-            switches["constrained-intra"] = "Other";
             switches["const-vbv"] = "Rate Control";
-            switches["copy-pic"] = "Performance";
             switches["cplxblur"] = "Rate Control";
+            switches["crf"] = "Rate Control";
             switches["crf-max"] = "Rate Control";
             switches["crf-min"] = "Rate Control";
             switches["crqpoffs"] = "Rate Control";
-            switches["csv"] = "Statistic";
-            switches["csv-log-level"] = "Statistic";
-            switches["ctu"] = "Analysis";
-            switches["ctu-info"] = "Slice Decision";
-            switches["cu-lossless"] = "Analysis";
-            switches["cu-stats"] = "Analysis";
             switches["cutree"] = "Rate Control";
-            switches["deblock"] = "Loop Filter";
-            switches["dhdr10-info"] = "VUI";
-            switches["dhdr10-opt"] = "VUI";
-            switches["display-window"] = "VUI";
-            switches["dither"] = "Input/Output";
-            switches["dolby-vision-profile"] = "Bitstream";
-            switches["dolby-vision-rpu"] = "Bitstream";
-            switches["dynamic-rd"] = "Analysis";
-            switches["dynamic-refine"] = "Analysis";
-            switches["early-skip"] = "Analysis";
-            switches["fades"] = "Slice Decision";
-            switches["fast-intra"] = "Analysis";
-            switches["field"] = "Input/Output";
-            switches["force-flush"] = "Slice Decision";
-            switches["fps"] = "Input/Output";
-            switches["frames"] = "Input/Output";
-            switches["frame-threads"] = "Performance";
-            switches["gop-lookahead"] = "Slice Decision";
-            switches["hash"] = "Bitstream";
-            switches["hdr"] = "VUI";
-            switches["hdr-opt"] = "VUI";
-            switches["hevc-aq"] = "Analysis";
-            switches["high-tier"] = "Other";
-            switches["hme"] = "Motion Search";
-            switches["hme-search"] = "Motion Search";
-            switches["hrd"] = "Bitstream";
-            switches["hrd-concat"] = "Bitstream";
-            switches["idr-recovery-sei"] = "Bitstream";
-            switches["info"] = "Bitstream";
-            switches["input-csp"] = "Input/Output";
-            switches["input-depth"] = "Input/Output";
-            switches["interlace"] = "Input/Output";
-            switches["intra-refresh"] = "Slice Decision";
             switches["ip-factor"] = "Rate Control";
             switches["ipratio"] = "Rate Control";
-            switches["keyint"] = "Slice Decision";
-            switches["lambda-file"] = "Other";
-            switches["limit-modes"] = "Analysis";
-            switches["limit-refs"] = "Analysis";
-            switches["limit-sao"] = "Loop Filter";
-            switches["limit-tu"] = "Analysis";
-            switches["log"] = "Statistic";
-            switches["log2-max-poc-lsb"] = "Bitstream";
-            switches["log-level"] = "Statistic";
-            switches["lookahead-slices"] = "Slice Decision";
-            switches["lookahead-threads"] = "Slice Decision";
             switches["lossless"] = "Rate Control";
-            switches["lowpass-dct"] = "Other";
-            switches["master-display"] = "VUI";
-            switches["max-ausize-factor"] = "Other";
-            switches["max-cll"] = "VUI";
-            switches["max-luma"] = "VUI";
-            switches["max-merge"] = "Motion Search";
-            switches["max-tu-size"] = "Analysis";
-            switches["me"] = "Motion Search";
-            switches["merange"] = "Motion Search";
-            switches["min-cu-size"] = "Analysis";
-            switches["min-keyint"] = "Slice Decision";
-            switches["min-luma"] = "VUI";
             switches["multi-pass-opt-analysis"] = "Rate Control";
             switches["multi-pass-opt-distortion"] = "Rate Control";
-            switches["multi-pass-opt-rps"] = "Bitstream";
-            switches["nalu-file"] = "VUI";
-            switches["no-amp"] = "Analysis";
-            switches["no-analyze-src-pics"] = "Motion Search";
-            switches["no-asm"] = "Performance";
-            switches["no-b-intra"] = "Analysis";
-            switches["no-b-pyramid"] = "Slice Decision";
-            switches["no-cll"] = "VUI";
-            switches["no-constrained-intra"] = "Other";
-            switches["no-const-vbv"] = "Rate Control";
-            switches["no-copy-pic"] = "Performance";
-            switches["no-cutree"] = "Rate Control";
-            switches["no-early-skip"] = "Analysis";
-            switches["no-fast-intra"] = "Analysis";
-            switches["no-field"] = "Input/Output";
-            switches["no-hme"] = "Motion Search";
-            switches["no-info"] = "Bitstream";
-            switches["no-open-gop"] = "Slice Decision";
-            switches["no-pme"] = "Performance";
-            switches["no-pmode"] = "Performance";
-            switches["no-rc-grain"] = "Rate Control";
-            switches["no-rect"] = "Analysis";
-            switches["no-rskip"] = "Analysis";
-            switches["no-sao"] = "Loop Filter";
-            switches["no-signhide"] = "Other";
-            switches["no-slow-firstpass"] = "Performance";
-            switches["no-strong-intra-smoothing"] = "Other";
-            switches["no-temporal-mvp"] = "Motion Search";
-            switches["no-weightb"] = "Motion Search";
-            switches["no-weightp"] = "Motion Search";
-            switches["no-wpp"] = "Performance";
             switches["nr-inter"] = "Rate Control";
             switches["nr-intra"] = "Rate Control";
-            switches["numa-pools"] = "Performance";
-            switches["open-gop"] = "Slice Decision";
-            switches["opt-cu-delta-qp"] = "Bitstream";
-            switches["opt-qp-pps"] = "Bitstream";
-            switches["opt-ref-list-length-pps"] = "Bitstream";
-            switches["overscan"] = "VUI";
             switches["pb-factor"] = "Rate Control";
             switches["pbratio"] = "Rate Control";
-            switches["pic-struct"] = "VUI";
-            switches["pme"] = "Performance";
-            switches["pmode"] = "Performance";
-            switches["pools"] = "Performance";
-            switches["psnr"] = "Statistic";
-            switches["psy-rd"] = "Other";
-            switches["psy-rdoq"] = "Analysis";
             switches["qblur"] = "Rate Control";
             switches["qcomp"] = "Rate Control";
             switches["qg-size"] = "Rate Control";
-            switches["qp-adaptation-range"] = "Analysis";
-            switches["qpfile"] = "Other";
             switches["qpmax"] = "Rate Control";
             switches["qpmin"] = "Rate Control";
             switches["qpstep"] = "Rate Control";
-            switches["radl"] = "Slice Decision";
-            switches["range"] = "VUI";
+            switches["rc"] = "Rate Control";
             switches["rc-grain"] = "Rate Control";
-            switches["rc-lookahead"] = "Slice Decision";
-            switches["rd"] = "Analysis";
-            switches["rdoq"] = "Analysis";
-            switches["rdoq-level"] = "Analysis";
-            switches["rdpenalty"] = "Other";
-            switches["rd-refine"] = "Analysis";
-            switches["recon"] = "Other";
-            switches["recon-depth"] = "Other";
-            switches["rect"] = "Analysis";
-            switches["ref"] = "Slice Decision";
-            switches["refine-analysis-type"] = "Slice Decision";
-            switches["refine-ctu-distortion"] = "Analysis";
-            switches["refine-inter"] = "Analysis";
-            switches["refine-intra"] = "Analysis";
-            switches["refine-mv"] = "Analysis";
-            switches["repeat-headers"] = "Bitstream";
-            switches["rskip"] = "Analysis";
-            switches["sao"] = "Loop Filter";
-            switches["sao-non-deblock"] = "Loop Filter";
-            switches["sar"] = "VUI";
-            switches["scale-factor"] = "Analysis";
-            switches["scaling-list"] = "Other";
-            switches["scenecut"] = "Slice Decision";
-            switches["scenecut-bias"] = "Slice Decision";
-            switches["seek"] = "Input/Output";
-            switches["selective-sao"] = "Loop Filter";
-            switches["signhide"] = "Other";
-            switches["single-sei"] = "Bitstream";
-            switches["slices"] = "Performance";
-            switches["slow-firstpass"] = "Performance";
-            switches["splitrd-skip"] = "Analysis";
-            switches["ssim"] = "Statistic";
-            switches["ssim-rd"] = "Analysis";
             switches["strict-cbr"] = "Rate Control";
-            switches["strong-intra-smoothing"] = "Other";
-            switches["subme"] = "Motion Search";
-            switches["temporal-layers"] = "Bitstream";
-            switches["temporal-mvp"] = "Motion Search";
-            switches["transfer"] = "VUI";
-            switches["tskip"] = "Analysis";
-            switches["tskip-fast"] = "Analysis";
-            switches["tu-inter-depth"] = "Analysis";
-            switches["tu-intra-depth"] = "Analysis";
-            switches["uhd-bd"] = "Other";
             switches["vbv-bufsize"] = "Rate Control";
             switches["vbv-end"] = "Rate Control";
             switches["vbv-end-fr-adj"] = "Rate Control";
             switches["vbv-init"] = "Rate Control";
             switches["vbv-maxrate"] = "Rate Control";
-            switches["videoformat"] = "VUI";
-            switches["vui-hrd-info"] = "Bitstream";
-            switches["vui-timing-info"] = "Bitstream";
-            switches["weightb"] = "Motion Search";
-            switches["weightp"] = "Motion Search";
-            switches["wpp"] = "Performance";
+            switches["zone-count"] = "Rate Control";
             switches["zonefile"] = "Rate Control";
             switches["zones"] = "Rate Control";
 
-            Dictionary<string, List<string>> groups = new Dictionary<string, List<string>>();
+            switches["amp"] = "Analysis";
+            switches["analysis-load"] = "Analysis";
+            switches["analysis-reuse-file"] = "Analysis";
+            switches["analysis-reuse-level"] = "Analysis";
+            switches["analysis-save"] = "Analysis";
+            switches["b-intra"] = "Analysis";
+            switches["ctu"] = "Analysis";
+            switches["cu-lossless"] = "Analysis";
+            switches["cu-stats"] = "Analysis";
+            switches["dynamic-rd"] = "Analysis";
+            switches["dynamic-refine"] = "Analysis";
+            switches["early-skip"] = "Analysis";
+            switches["fast-intra"] = "Analysis";
+            switches["hevc-aq"] = "Analysis";
+            switches["limit-modes"] = "Analysis";
+            switches["limit-refs"] = "Analysis";
+            switches["limit-tu"] = "Analysis";
+            switches["max-tu-size"] = "Analysis";
+            switches["min-cu-size"] = "Analysis";
+            switches["psy-rdoq"] = "Analysis";
+            switches["qp-adaptation-range"] = "Analysis";
+            switches["rd"] = "Analysis";
+            switches["rdoq"] = "Analysis";
+            switches["rdoq-level"] = "Analysis";
+            switches["rdpenalty"] = "Analysis";
+            switches["rd-refine"] = "Analysis";
+            switches["rect"] = "Analysis";
+            switches["refine-ctu-distortion"] = "Analysis";
+            switches["refine-inter"] = "Analysis";
+            switches["refine-intra"] = "Analysis";
+            switches["refine-mv"] = "Analysis";
+            switches["rskip"] = "Analysis";
+            switches["scale-factor"] = "Analysis";
+            switches["splitrd-skip"] = "Analysis";
+            switches["ssim-rd"] = "Analysis";
+            switches["tskip"] = "Analysis";
+            switches["tskip-fast"] = "Analysis";
+            switches["tu-inter-depth"] = "Analysis";
+            switches["tu-intra-depth"] = "Analysis";
 
-            foreach (var pair in switches)
+            switches["b-adapt"] = "Slice Decision";
+            switches["bframe-bias"] = "Slice Decision";
+            switches["bframes"] = "Slice Decision";
+            switches["b-pyramid"] = "Slice Decision";
+            switches["ctu-info"] = "Slice Decision";
+            switches["fades"] = "Slice Decision";
+            switches["force-flush"] = "Slice Decision";
+            switches["gop-lookahead"] = "Slice Decision";
+            switches["intra-refresh"] = "Slice Decision";
+            switches["keyint"] = "Slice Decision";
+            switches["lookahead-slices"] = "Slice Decision";
+            switches["lookahead-threads"] = "Slice Decision";
+            switches["min-keyint"] = "Slice Decision";
+            switches["open-gop"] = "Slice Decision";
+            switches["radl"] = "Slice Decision";
+            switches["rc-lookahead"] = "Slice Decision";
+            switches["ref"] = "Slice Decision";
+            switches["refine-analysis-type"] = "Slice Decision";
+            switches["scenecut"] = "Slice Decision";
+            switches["scenecut-bias"] = "Slice Decision";
+
+            switches["analyze-src-pics"] = "Motion Search";
+            switches["hme"] = "Motion Search";
+            switches["hme-search"] = "Motion Search";
+            switches["max-merge"] = "Motion Search";
+            switches["me"] = "Motion Search";
+            switches["merange"] = "Motion Search";
+            switches["subme"] = "Motion Search";
+            switches["temporal-mvp"] = "Motion Search";
+            switches["weightb"] = "Motion Search";
+            switches["weightp"] = "Motion Search";
+
+            switches["deblock"] = "Loop Filter";
+            switches["limit-sao"] = "Loop Filter";
+            switches["sao"] = "Loop Filter";
+            switches["sao-non-deblock"] = "Loop Filter";
+            switches["selective-sao"] = "Loop Filter";
+
+            switches["atc-sei"] = "VUI";
+            switches["chromaloc"] = "VUI";
+            switches["cll"] = "VUI";
+            switches["colormatrix"] = "VUI";
+            switches["colorprim"] = "VUI";
+            switches["dhdr10-info"] = "VUI";
+            switches["dhdr10-opt"] = "VUI";
+            switches["display-window"] = "VUI";
+            switches["hdr"] = "VUI";
+            switches["hdr-opt"] = "VUI";
+            switches["master-display"] = "VUI";
+            switches["max-cll"] = "VUI";
+            switches["max-luma"] = "VUI";
+            switches["min-luma"] = "VUI";
+            switches["nalu-file"] = "VUI";
+            switches["overscan"] = "VUI";
+            switches["pic-struct"] = "VUI";
+            switches["range"] = "VUI";
+            switches["sar"] = "VUI";
+            switches["transfer"] = "VUI";
+            switches["videoformat"] = "VUI";
+
+            switches["annexb"] = "Bitstream";
+            switches["aud"] = "Bitstream";
+            switches["dolby-vision-profile"] = "Bitstream";
+            switches["dolby-vision-rpu"] = "Bitstream";
+            switches["hash"] = "Bitstream";
+            switches["hrd"] = "Bitstream";
+            switches["hrd-concat"] = "Bitstream";
+            switches["idr-recovery-sei"] = "Bitstream";
+            switches["info"] = "Bitstream";
+            switches["log2-max-poc-lsb"] = "Bitstream";
+            switches["multi-pass-opt-rps"] = "Bitstream";
+            switches["opt-cu-delta-qp"] = "Bitstream";
+            switches["opt-qp-pps"] = "Bitstream";
+            switches["opt-ref-list-length-pps"] = "Bitstream";
+            switches["repeat-headers"] = "Bitstream";
+            switches["single-sei"] = "Bitstream";
+            switches["temporal-layers"] = "Bitstream";
+            switches["vui-hrd-info"] = "Bitstream";
+            switches["vui-timing-info"] = "Bitstream";
+
+            switches["chunk-end"] = "Input/Output";
+            switches["chunk-start"] = "Input/Output";
+            switches["dither"] = "Input/Output";
+            switches["field"] = "Input/Output";
+            switches["fps"] = "Input/Output";
+            switches["frames"] = "Input/Output";
+            switches["input-csp"] = "Input/Output";
+            switches["input-depth"] = "Input/Output";
+            switches["input-res"] = "Input/Output";
+            switches["interlace"] = "Input/Output";
+            switches["seek"] = "Input/Output";
+            switches["total-frames"] = "Input/Output";
+
+            switches["asm"] = "Performance";
+            switches["copy-pic"] = "Performance";
+            switches["frame-threads"] = "Performance";
+            switches["numa-pools"] = "Performance";
+            switches["pme"] = "Performance";
+            switches["pmode"] = "Performance";
+            switches["pools"] = "Performance";
+            switches["slices"] = "Performance";
+            switches["slow-firstpass"] = "Performance";
+            switches["wpp"] = "Performance";
+
+            switches["csv"] = "Statistic";
+            switches["csv-log-level"] = "Statistic";
+            switches["log"] = "Statistic";
+            switches["log-level"] = "Statistic";
+            switches["psnr"] = "Statistic";
+            switches["ssim"] = "Statistic";
+            switches["stats-read"] = "Statistic";
+            switches["stats-write"] = "Statistic";
+
+            switches["allow-non-conformance"] = "Other";
+            switches["cip"] = "Other";
+            switches["constrained-intra"] = "Other";
+            switches["high-tier"] = "Other";
+            switches["lambda-file"] = "Other";
+            switches["lowpass-dct"] = "Other";
+            switches["max-ausize-factor"] = "Other";
+            switches["psy-rd"] = "Other";
+            switches["qpfile"] = "Other";
+            switches["recon"] = "Other";
+            switches["recon-depth"] = "Other";
+            switches["scaling-list"] = "Other";
+            switches["signhide"] = "Other";
+            switches["strong-intra-smoothing"] = "Other";
+            switches["uhd-bd"] = "Other";
+
+            OrderedDictionary targetDictionary = new OrderedDictionary();
+
+            foreach (string value in switches.Values)
             {
-                if (!groups.ContainsKey(pair.Value))
-                    groups[pair.Value] = new List<string>();
-
-                if (!groups[pair.Value].Contains(pair.Key))
-                    groups[pair.Value].Add(pair.Key);
+                if (!targetDictionary.Contains(value))
+                    targetDictionary[value] = new List<string>();
             }
 
-            List<KeyValuePair<string, List<string>>> list = new List<KeyValuePair<string, List<string>>>();
-
-            list.Add(new KeyValuePair<string, List<string>>("Analysis", new List<string>()));
-            list.Add(new KeyValuePair<string, List<string>>("Rate Control", new List<string>()));
-            list.Add(new KeyValuePair<string, List<string>>("Slice Decision", new List<string>()));
-            list.Add(new KeyValuePair<string, List<string>>("Motion Search", new List<string>()));
-            list.Add(new KeyValuePair<string, List<string>>("Performance", new List<string>()));
-            list.Add(new KeyValuePair<string, List<string>>("Bitstream", new List<string>()));
-            list.Add(new KeyValuePair<string, List<string>>("VUI", new List<string>()));
-            list.Add(new KeyValuePair<string, List<string>>("Statistic", new List<string>()));
-            list.Add(new KeyValuePair<string, List<string>>("Loop Filter", new List<string>()));
-            list.Add(new KeyValuePair<string, List<string>>("Input/Output", new List<string>()));
-            list.Add(new KeyValuePair<string, List<string>>("Other", new List<string>()));
-
-            foreach (string _switch in item.Value.Split(" / "))
+            Dictionary<string, string> sourceDictionary = new Dictionary<string, string>();
+            
+            foreach (string value in item.Value.Split(" / "))
             {
-                string name = _switch;
-
-                if (name.Contains("="))
-                    name = name.Substring(0, name.IndexOf("=")).Trim();
-
-                string group = "Other";
-
-                foreach (var groupPair in groups)
+                if (value.Contains("="))
                 {
-                    if (groupPair.Value.Contains(name))
-                    {
-                        group = groupPair.Key;
-                        break;
-                    }
+                    string left = value.Substring(0, value.IndexOf("="));
+                    sourceDictionary[left] = value;
                 }
-
-                foreach (var i in list)
+                else
                 {
-                    if (i.Key == group)
-                    {
-                        i.Value.Add(_switch);
-                        break;
-                    }
+                    if (value.StartsWith("no-"))
+                        sourceDictionary[value.Substring(3)] = value;
+                    else
+                        sourceDictionary[value] = value;
                 }
             }
 
+            List<string> added = new List<string>();
+
+            foreach (string key in switches.Keys)
+            {
+                if (sourceDictionary.ContainsKey(key))
+                {
+                    ((List<string>)targetDictionary[switches[key]]).Add(sourceDictionary[key]);
+                    added.Add(key);
+                }
+            }
+
+            foreach (string key in sourceDictionary.Keys)
+                if (!added.Contains(key))
+                    ((List<string>)(targetDictionary["Other"])).Add(sourceDictionary[key]);
+
+            ((List<string>)(targetDictionary["Other"])).Sort();
             string text = "\r\n";
 
-            foreach (var i in list)
+            foreach (string? key in targetDictionary.Keys)
             {
-                if (i.Value.Count == 0)
+                List<string> list = (List<string>)targetDictionary[key];
+
+                if (list?.Count == 0)
                     continue;
 
-                text += "\r\n    " + i.Key + "\r\n";
-
+                text += "\r\n    " + key + "\r\n";
                 string temp = "";
-                
-                foreach (var i2 in i.Value)
+
+                foreach (string value in list)
                 {
-                    temp += " / " + i2;
+                    temp += " / " + value;
 
                     if (temp.Length > 40)
                     {
@@ -853,6 +834,7 @@ namespace MediaInfoNET
 
                 if (temp != "")
                     text += "        " + temp.Trim(" /".ToCharArray()) + "\r\n";
+
             }
 
             item.Value = text;

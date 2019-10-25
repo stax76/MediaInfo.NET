@@ -5,7 +5,6 @@ public class MediaInfo : IDisposable
 {
     IntPtr Handle;
     static bool Loaded;
-    public static bool RawView { get; set; }
 
     public MediaInfo(string path)
     {
@@ -24,11 +23,6 @@ public class MediaInfo : IDisposable
 
         if (MediaInfo_Open(Handle, path) == 0)
             throw new Exception("Error MediaInfo_Open");
-
-        if (RawView)
-            MediaInfo_Option(Handle, "Language", "raw");
-        else
-            MediaInfo_Option(Handle, "Language", "");
     }
 
     public string GetInfo(MediaInfoStreamKind streamKind, int streamNumber, string parameter)
@@ -36,8 +30,9 @@ public class MediaInfo : IDisposable
         return Marshal.PtrToStringUni(MediaInfo_Get(Handle, streamKind, streamNumber, parameter, MediaInfoInfoKind.Text, MediaInfoInfoKind.Name)) ?? "";
     }
 
-    public string GetSummary(bool complete)
+    public string GetSummary(bool complete, bool rawView)
     {
+        MediaInfo_Option(Handle, "Language", rawView ? "raw" : "");
         MediaInfo_Option(Handle, "Complete", complete ? "1" : "0");
         return Marshal.PtrToStringUni(MediaInfo_Inform(Handle, 0)) ?? "";
     }

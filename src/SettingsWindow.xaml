@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         
         Title="Settings"
-        Height="490"
+        Height="470"
         Width="550"
         FontSize="14"
         Background="LightGray"
@@ -17,12 +17,8 @@
 
     <Grid>
         <StackPanel Margin="20">
-            <CheckBox Name="RawViewCheckBox"
-                      IsChecked="{Binding RawView}"
-                      Margin="5">Show parameter names as they are used in the MediaInfo API</CheckBox>
-            <CheckBox IsChecked="{Binding ShowCompactSummary}"
-                      IsEnabled="{Binding IsChecked, ElementName=RawViewCheckBox}"
-                      Margin="30 5 5 5">Show compact summary on top of basic tab</CheckBox>
+            <CheckBox IsChecked="{Binding RawView}" Margin="5">Show parameter names as they are used in the MediaInfo API</CheckBox>
+            <CheckBox IsChecked="{Binding ShowCompactSummary}" Margin="5">Show compact summary on top of basic tab</CheckBox>
             <CheckBox IsChecked="{Binding WordWrap}" Margin="5">Word Wrap</CheckBox>
             <CheckBox IsChecked="{Binding CenterScreen}" Margin="5">Start app in center of screen</CheckBox>
             <CheckBox IsChecked="{Binding FormatEncoded}" Margin="5">Show special presentation of encoding settings</CheckBox>
@@ -86,7 +82,7 @@
             <Label>File Types to install:</Label>           
             <TextBox Text="{Binding FileTypes}"
                      TextWrapping="Wrap"
-                     Height="85"
+                     Height="65"
                      HorizontalAlignment="Stretch"
                      Margin="0 3 0 0"/>
         </StackPanel>
