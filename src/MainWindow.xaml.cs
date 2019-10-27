@@ -136,8 +136,9 @@ namespace MediaInfoNET
             HashSet<string> captionNames = new HashSet<string>();
             captionNames.Add("Basic");
             captionNames.Add("Advanced");
-            Items = GetItems(App.Settings.RawView);
+
             ItemsRaw = GetItems(true);
+            Items = App.Settings.RawView ? ItemsRaw : GetItems(false);
 
             foreach (MediaInfoParameter item in Items)
                 captionNames.Add(item.Group);

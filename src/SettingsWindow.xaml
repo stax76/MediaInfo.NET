@@ -28,6 +28,7 @@
                 <ComboBox SelectedValue="{Binding Theme}"
                           SelectedValuePath="Content"
                           Width="130"
+                          Height="25"
                           HorizontalContentAlignment="Center">
                     <ComboBoxItem>Light</ComboBoxItem>
                     <ComboBoxItem>Dark</ComboBoxItem>
