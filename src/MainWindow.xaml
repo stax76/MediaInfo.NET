@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         
-        Background="#1E1E1E"
         AllowDrop="True"
         Drop="Window_Drop"
         KeyDown="Window_KeyDown"
+        Activated="Window_Activated"
         PreviewDragOver="Window_PreviewDragOver">
-
+   
     <Grid FocusManager.FocusedElement="{Binding ElementName=SearchTextBox}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -26,19 +26,22 @@
             <TextBlock Name="HintTextBlock"
                        Text="Search"
                        Padding="5 0 0 0" 
-                       Foreground="#E6E6E6"
-                       Background="#1E1E1E"
+                       Foreground="{Binding Foreground}"
+                       Background="{Binding Background}"
                        VerticalAlignment="Center" />
 
-            <Border BorderThickness="0 0 0 1" BorderBrush="#E6E6E6">
-               <TextBox Name="SearchTextBox"
-                        Height="30"
-                        VerticalContentAlignment="Center"
-                        Padding="1,2,0,0"
-                        BorderThickness="0 0 0 0"
-                        Background="Transparent"
-                        TextChanged="SearchTextBox_TextChanged"
-                        Foreground="#E6E6E6" CaretBrush="White" />
+            <Border BorderBrush="{Binding BorderColor}"
+                    BorderThickness="0 0 0 1">
+                
+                <TextBox Name="SearchTextBox"
+                         Height="30"
+                         VerticalContentAlignment="Center"
+                         Padding="2,2,0,0"
+                         BorderThickness="0 0 0 0"
+                         Background="Transparent"
+                         TextChanged="SearchTextBox_TextChanged"
+                         Foreground="{Binding Foreground}"
+                         CaretBrush="{Binding Foreground}" />
             </Border>        
             
             <Button Name="ClearButton"
@@ -47,6 +50,7 @@
                     Margin="0 0 5 0"
                     FontSize="12"
                     FontFamily="Marlett"
+                    Foreground="{Binding Foreground}"
                     Width="20"
                     Height="20"
                     Visibility="Hidden"
@@ -54,7 +58,7 @@
                 
                 <Button.Style>
                     <Style TargetType="Button">
-                        <Setter Property="Background" Value="#686868"/>
+                        <Setter Property="Background" Value="{Binding Path=ItemHoverColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="Button">
@@ -66,7 +70,7 @@
                         </Setter>
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#A0A0A0"/>
+                                <Setter Property="Background" Value="{Binding Path=ItemSelectionColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -75,24 +79,75 @@
         </Grid>
 
         <ListBox Name="TabListBox"
+                 DisplayMemberPath="Name"
                  Grid.Row="1" 
                  SelectionChanged="TabListBox_SelectionChanged"
-                 Background="#1E1E1E"
-                 Foreground="#E6E6E6"
+                 Foreground="{Binding Foreground}"
+                 Background="{Binding Background}"
                  BorderThickness="0">
-            
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}"
-                               VerticalAlignment="Center"
-                               Padding="7">
-                    </TextBlock>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Padding" Value="7" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        Background="{TemplateBinding Background}"
+                                        Padding="{TemplateBinding Padding}"
+                                        SnapsToDevicePixels="true">
+
+                                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                </Border>
+                                <ControlTemplate.Triggers>
+
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="Selector.IsSelectionActive"
+                                                       Value="True" />
+                                            <Condition Property="IsSelected"
+                                                       Value="True" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background"
+                                                Value="{Binding Path=ItemSelectionColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
+                                    </MultiTrigger>                                    
+                                    
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="Selector.IsSelectionActive"
+                                                       Value="False" />
+                                            <Condition Property="IsSelected"
+                                                       Value="True" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background"
+                                                Value="{Binding Path=ItemHoverColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
+                                    </MultiTrigger>
+
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="UIElement.IsMouseOver"
+                                                       Value="True" />
+                                            <Condition Property="IsSelected"
+                                                       Value="False" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background"
+                                                Value="{Binding Path=ItemHoverColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
+                                    </MultiTrigger>
+
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
         </ListBox>
 
-        <Border BorderThickness="1 0 0 0"
-                BorderBrush="#E6E6E6"
+        <Border BorderBrush="{Binding BorderColor}"
+                BorderThickness="1 0 0 0"
                 Grid.Column="1"
                 Grid.RowSpan="2">
             
@@ -101,12 +156,12 @@
                          HorizontalScrollBarVisibility="Auto"
                          VerticalScrollBarVisibility="Auto"
                          IsReadOnlyCaretVisible="True"
-                         Background="#1E1E1E"
-                         Foreground="#E6E6E6"
-                         SelectionBrush="AliceBlue"
+                         SelectionBrush="{Binding TextSelectionColor}"
                          BorderThickness="0"
-                         Padding="10"
+                         Padding="12"
                          AllowDrop="True"
+                         Foreground="{Binding Foreground}"
+                         Background="{Binding Background}"
                          Drop="ContentRichTextBox_Drop"
                          SelectionChanged="ContentRichTextBox_SelectionChanged"
                          PreviewDragOver="ContentRichTextBox_PreviewDragOver">

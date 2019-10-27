@@ -10,18 +10,16 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AssemblyName>MediaInfoNET</AssemblyName>
     <RootNamespace>MediaInfoNET</RootNamespace>
-    <StartupObject>Program</StartupObject>
+    <StartupObject>MediaInfoNET.Program</StartupObject>
     <Product>MediaInfo.NET</Product>
     <Company>Frank Skare (stax76)</Company>
     <Authors>Frank Skare (stax76)</Authors>
-    <Version>5.0</Version>
-    <AssemblyVersion>5.0.0.0</AssemblyVersion>
+    <Version>5.1</Version>
+    <AssemblyVersion>5.1.0.0</AssemblyVersion>
     <PackageId>MediaInfo.NET</PackageId>
-    <Description>Best MediaInfo GUI available</Description>
+    <Description>Modern MediaInfo GUI available</Description>
     <Copyright>2019 Frank Skare (stax76)</Copyright>
-    <PackageProjectUrl></PackageProjectUrl>
-    <RepositoryUrl></RepositoryUrl>
     <ApplicationManifest>App.manifest</ApplicationManifest>
   </PropertyGroup>
-
+  
 </Project>

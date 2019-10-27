@@ -1,92 +1,102 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using MediaInfoNET;
 using WinForms = System.Windows.Forms;
 
-public class Program
+namespace MediaInfoNET
 {
-    [STAThread]
-    public static void Main(string[] args)
+    class Program
     {
-        try
+        [STAThread]
+        public static void Main(string[] args)
         {
-            if (!File.Exists(App.SettingsFile))
+            try
             {
-                using TaskDialog<string> td = new TaskDialog<string>();
-                td.MainInstruction = "Choose a settings directory.";
-                td.AddCommandLink("AppData");
-                td.AddCommandLink("Portable");
-                td.AddCommandLink("Custom");
-                td.AddCommandLink("Cancel");
-                td.Show();
-
-                if (string.IsNullOrEmpty(td.SelectedValue) || td.SelectedValue == "Cancel")
-                    return;
-
-                switch (td.SelectedValue)
+                if (!File.Exists(App.SettingsFile))
                 {
-                    case "AppData":
-                        App.SettingsFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
-                            + "\\" + AppHelp.ProductName + "\\Settings.xml";
-                        break;
-                    case "Portable":
-                        App.SettingsFile = WinForms.Application.StartupPath + "\\Settings.xml";
-                        break;
-                    case "Custom":
-                        using (WinForms.FolderBrowserDialog dialog = new WinForms.FolderBrowserDialog())
-                        {
-                            if (dialog.ShowDialog() == WinForms.DialogResult.OK)
-                                App.SettingsFile = dialog.SelectedPath + "\\Settings.xml";
-                            else
-                                return;
-                        }
-                        break;
-                }
-            }
+                    WinForms.Application.SetHighDpiMode(WinForms.HighDpiMode.SystemAware);
 
-            if (args.Length == 1 && (args[0] == "--install" || args[0] == "--uninstall"))
-                Setup(args[0] == "--install");
+                    using TaskDialog<string> td = new TaskDialog<string>();
+                    td.MainInstruction = "Choose a settings directory.";
+                    td.AddCommandLink("AppData");
+                    td.AddCommandLink("Portable");
+                    td.AddCommandLink("Custom");
+                    td.AddCommandLink("Cancel");
+                    td.Show();
+
+                    if (string.IsNullOrEmpty(td.SelectedValue) || td.SelectedValue == "Cancel")
+                        return;
+
+                    switch (td.SelectedValue)
+                    {
+                        case "AppData":
+                            App.SettingsFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+                                + "\\" + AppHelp.ProductName + "\\Settings.xml";
+                            break;
+                        case "Portable":
+                            App.SettingsFile = WinForms.Application.StartupPath + "\\Settings.xml";
+                            break;
+                        case "Custom":
+                            using (WinForms.FolderBrowserDialog dialog = new WinForms.FolderBrowserDialog())
+                            {
+                                if (dialog.ShowDialog() == WinForms.DialogResult.OK)
+                                    App.SettingsFile = dialog.SelectedPath + "\\Settings.xml";
+                                else
+                                    return;
+                            }
+                            break;
+                    }
+                }
+
+                if (args.Length == 1 && (args[0] == "--install" || args[0] == "--uninstall"))
+                    Setup(args[0] == "--install");
+                else
+                    App.Main();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, AppHelp.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        static void Setup(bool install)
+        {
+            string[] extensions = App.Settings.FileTypes.Split(" \r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+            if (install)
+            {
+                string exePath = Process.GetCurrentProcess().MainModule.FileName;
+
+                foreach (string ext in extensions)
+                {
+                    string filekeyName = RegistryHelp.GetString(@"HKCR\." + ext, null);
+
+                    if (filekeyName == "")
+                    {
+                        RegistryHelp.SetValue(@"HKCR\." + ext, null, ext + "file");
+                        filekeyName = ext + "file";
+                    }
+
+                    RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET", null, "MediaInfo");
+                    RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET\command", null, $"\"{exePath}\" \"%1\"");
+                }
+
+                MessageBox.Show("Install complete", AppHelp.ProductName, MessageBoxButton.OK, MessageBoxImage.Information);
+            }
             else
-                new App().Run(new MainWindow());
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, AppHelp.ProductName + " Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    static void Setup(bool install)
-    {
-        string[] extensions = App.Settings.FileTypes.Split(" \r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-
-        if (install)
-        {
-            string exePath = Process.GetCurrentProcess().MainModule.FileName;
-
-            foreach (string ext in extensions)
             {
-                string filekeyName = RegistryHelp.GetString(@"HKCR\." + ext, null);
-
-                if (filekeyName == "")
+                foreach (string name in Registry.ClassesRoot.GetSubKeyNames())
                 {
-                    RegistryHelp.SetValue(@"HKCR\." + ext, null, ext + "file");
-                    filekeyName = ext + "file";
+                    if (!name.StartsWith("."))
+                        continue;
+
+                    RegistryHelp.RemoveKey(@"HKCR\" + RegistryHelp.GetString(@"HKCR\" + name, null) + @"\shell\MediaInfo.NET");
                 }
 
-                RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET", null, "MediaInfo");
-                RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET\command", null, $"\"{exePath}\" \"%1\"");
+                MessageBox.Show("Uninstall complete", AppHelp.ProductName, MessageBoxButton.OK, MessageBoxImage.Information);
             }
-
-            MessageBox.Show("Install complete", "Install", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-        else
-        {
-            foreach (string ext in extensions)
-                RegistryHelp.RemoveKey(@"HKCR\" + RegistryHelp.GetString(@"HKCR\." + ext, null) + @"\shell\MediaInfo.NET");
-
-            MessageBox.Show("Uninstall complete", "Uninstall", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

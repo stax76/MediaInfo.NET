@@ -24,6 +24,18 @@
             <CheckBox IsChecked="{Binding FormatEncoded}" Margin="5">Show special presentation of encoding settings</CheckBox>
 
             <StackPanel Orientation="Horizontal">
+                <Label VerticalAlignment="Center" Width="110">Theme:</Label>
+                <ComboBox SelectedValue="{Binding Theme}"
+                          SelectedValuePath="Content"
+                          Width="130"
+                          HorizontalContentAlignment="Center">
+                    <ComboBoxItem>Light</ComboBoxItem>
+                    <ComboBoxItem>Dark</ComboBoxItem>
+                    <ComboBoxItem>System</ComboBoxItem>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
                 <Label VerticalAlignment="Center" Width="110">Font:</Label>
                 <TextBox Name="FontTextBox"
                          Text="{Binding FontName}"
@@ -71,7 +83,7 @@
 
             <StackPanel Orientation="Horizontal">
                 <Label Width="110"
-                       xml:space="preserve">Parameters&#10;to hide (one&#10;per line):</Label>
+                       xml:space="preserve">Parameters&#10;to hide&#10;(one per line):</Label>
                 <TextBox Text="{Binding Exclude}"
                          AcceptsReturn="True"
                          Width="250"

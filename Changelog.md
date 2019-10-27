@@ -1,4 +1,14 @@
+### 5.1
 
+- new setting 'Theme' added with 'Light', 'Dark' and 'System' option,
+  theme colors are not hard coded but defined in Settings.xml
+- fix for window starting in background on very first start
+- file association uninstall scans now all extensions and not only
+  the ones that are defined in the settings
+- encoding settings are now alphabetically ordered
+- compact summary is no longer limited to raw view, it's now
+  also available in normal view
+ 
 ### 5.0
 
 - changelog added to repo

@@ -2,11 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -16,22 +20,81 @@ using WinForms = System.Windows.Forms;
 
 namespace MediaInfoNET
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         string SourcePath = "";
         String ActiveGroup = "";
+
         List<MediaInfoParameter> Items = new List<MediaInfoParameter>();
         List<MediaInfoParameter> ItemsRaw = new List<MediaInfoParameter>();
 
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
             ApplySettings();
 
             if (Environment.GetCommandLineArgs().Length > 1)
                 LoadFile(Environment.GetCommandLineArgs()[1]);
             else
                 SetText("Drag files here or right-click.");
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        string _TextSelectionColor = "";
+
+        public string TextSelectionColor {
+            get => _TextSelectionColor;
+            set {
+                _TextSelectionColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        string _BorderColor = "";
+
+        public string BorderColor {
+            get => _BorderColor;
+            set {
+                _BorderColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        string _ItemSelectionColor = "";
+
+        public string ItemSelectionColor {
+            get => _ItemSelectionColor;
+            set {
+                _ItemSelectionColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        string _ItemHoverColor = "";
+
+        public string ItemHoverColor {
+            get => _ItemHoverColor;
+            set {
+                _ItemHoverColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        string _HighlightColor = "";
+
+        public string HighlightColor {
+            get => _HighlightColor;
+            set {
+                _HighlightColor = value;
+                NotifyPropertyChanged();
+            }
         }
 
         void ApplySettings()
@@ -41,6 +104,21 @@ namespace MediaInfoNET
             Width = App.Settings.WindowWidth;
             Height = App.Settings.WindowHeight;
             WindowStartupLocation = App.Settings.CenterScreen ? WindowStartupLocation.CenterScreen : WindowStartupLocation.Manual;
+
+            Theme theme = App.Settings.Theme switch
+            {
+                "Light" => App.Settings.LightTheme,
+                "Dark" => App.Settings.DarkTheme,
+                _ => AppHelp.IsDarkTheme ? App.Settings.DarkTheme : App.Settings.LightTheme
+            };
+
+            Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(theme.Background));
+            Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(theme.Foreground));
+            TextSelectionColor = theme.TextSelection;
+            ItemSelectionColor = theme.ItemSelection;
+            ItemHoverColor = theme.ItemHover;
+            BorderColor = theme.Border;
+            HighlightColor = theme.Highlight;
         }
 
         void LoadFile(string file)
@@ -362,7 +440,7 @@ namespace MediaInfoNET
 
             if (findRange != null)
             {
-                findRange.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Green);
+                findRange.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush((Color)ColorConverter.ConvertFromString(HighlightColor)));
                 Highlight(findRange.End, endPos, find);
             }
         }
@@ -881,6 +959,23 @@ namespace MediaInfoNET
         {
             Msg.Show(AppHelp.ProductName + " " + WinForms.Application.ProductVersion,
                 "Copyright © 2008-2019 Frank Skare (stax76)\n\nMIT License");
+        }
+
+        bool WasActivated;
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+            if (!WasActivated)
+            {
+                ActivateWindow();
+                WasActivated = true;
+            }
+        }
+
+        async void ActivateWindow()
+        {
+            await Task.Run(new Action(() => Thread.Sleep(500)));
+            Activate();
         }
     }
 }
