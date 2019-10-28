@@ -34,7 +34,7 @@ Developers can enable raw view to show parameter names as they are used in the M
 
 MediaInfo.NET registers itself in the registry at:
 
-HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths\
+`HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths\`
 
 This enables third party apps to find and start MediaInfo.NET.
 
