@@ -49,7 +49,7 @@ https://github.com/stax76/Get-MediaInfo
 **StaxRip** is a encoding GUI that integrates MediaInfo.NET.  
 https://github.com/staxrip/staxrip
 
-**mpv** and **mpv.net** are media players that allow to intergrate MediaInfo.NET.  
+**mpv** and **mpv.net** are media players that allow to integrate MediaInfo.NET.  
 https://mpv.io/
 https://github.com/stax76/mpv.net
 
