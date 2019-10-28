@@ -7,7 +7,7 @@ public class AppSettings
     public bool CompactSummary { get; set; } = true;
     public bool WordWrap { get; set; }
     public bool CenterScreen { get; set; } = true;
-    public bool FormatEncoded { get; set; } = true;
+    public bool FormatEncoded { get; set; }
     
     public int WindowWidth { get; set; } = 750;
     public int WindowHeight { get; set; } = 550;

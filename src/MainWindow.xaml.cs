@@ -200,7 +200,7 @@ namespace MediaInfoNET
                     item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
                     item.Group = group;
                     item.IsComplete = true;
-                    Fix(item);
+                    Fix(item, rawView);
                     items.Add(item);
                 }
                 else
@@ -221,7 +221,7 @@ namespace MediaInfoNET
 
                     item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
                     item.Group = group;
-                    Fix(item);
+                    Fix(item, rawView);
                     items.Add(item);
                 }
                 else
@@ -231,7 +231,7 @@ namespace MediaInfoNET
             return items;
         }
 
-        void Fix(MediaInfoParameter item)
+        void Fix(MediaInfoParameter item, bool rawView)
         {
             if (item.Name.StartsWith("FrameRate/"))
             {
@@ -259,8 +259,22 @@ namespace MediaInfoNET
                 item.Value = item.Value.Replace("bit3", "bits");
             else if ((item.Name == "Encoded_Library_Settings" || item.Name == "Encoding settings")
                 && App.Settings.FormatEncoded)
-                
+
                 Format_Encoded_Library_Settings(item);
+            else if (!rawView && item.Name == "Language" && item.Value.Length == 2)
+                item.Value = GetLanguageName(item.Value);
+        }
+
+        string GetLanguageName(string id)
+        {
+            try
+            {
+                return new CultureInfo(id).EnglishName;
+            }
+            catch
+            {
+                return id;
+            }
         }
 
         string GetValue(string group, string name)
@@ -325,7 +339,7 @@ namespace MediaInfoNET
                         string lang = GetValue(group, "Language/String");
 
                         if (lang.Length == 2)
-                            lang = new CultureInfo(lang).EnglishName;
+                            lang = GetLanguageName(lang);
 
                         values.Add(lang);
 
