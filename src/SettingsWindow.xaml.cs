@@ -1,6 +1,11 @@
 ﻿using System.Windows;
 using System.Windows.Input;
-using WinForms = System.Windows.Forms;
+using System.Windows.Media;
+using System.Linq;
+using System.Globalization;
+using System.Windows.Navigation;
+using System.Diagnostics;
+using System.IO;
 
 namespace MediaInfoNET
 {
@@ -10,6 +15,18 @@ namespace MediaInfoNET
         {
             InitializeComponent();
             DataContext = App.Settings;
+
+            var fixedWidthFontNames = Fonts.SystemTypefaces
+                .GroupBy(x => x.FontFamily.ToString())
+                .Select(grp => grp.First())
+                .Where(x => new FormattedText("Hl", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, x, 10, Brushes.Black, VisualTreeHelper.GetDpi(this).PixelsPerDip).Width == new FormattedText("HH", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, x, 10, Brushes.Black, VisualTreeHelper.GetDpi(this).PixelsPerDip).Width)
+                .Select(x => x.FontFamily.ToString()).ToList();
+
+            foreach (string name in new[] { "Segoe MDL2 Assets", "Webdings", "HoloLens MDL2 Assets", "MS Outlook" })
+                if (fixedWidthFontNames.Contains(name))
+                    fixedWidthFontNames.Remove(name);
+
+            FontComboBox.ItemsSource = fixedWidthFontNames;
         }
 
         private void SettingsWindow_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -23,19 +40,12 @@ namespace MediaInfoNET
             }
         }
 
-        private void FontButton_Click(object sender, RoutedEventArgs e)
+        private void OpenSettingsFolderHyperlink_Click(object sender, RoutedEventArgs e)
         {
-            using WinForms.FontDialog dialog = new WinForms.FontDialog();
-            dialog.FixedPitchOnly = true;
-            dialog.Font = new System.Drawing.Font(FontTextBox.Text, float.Parse(FontSizeTextBox.Text));
-
-            if (dialog.ShowDialog() == WinForms.DialogResult.OK)
-            {
-                App.Settings.FontName = dialog.Font.FontFamily.Name;
-                App.Settings.FontSize = dialog.Font.Size;
-                FontTextBox.Text = dialog.Font.FontFamily.Name;
-                FontSizeTextBox.Text = dialog.Font.Size.ToString();
-            }
+            Process.Start(new ProcessStartInfo() {
+                UseShellExecute = true,
+                FileName = Path.GetDirectoryName(App.SettingsFile)
+            });
         }
     }
 }

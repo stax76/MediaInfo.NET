@@ -1,3 +1,22 @@
+### 5.2
+
+- in the settings dialog the layout was improved,
+  the font picker was replaced with a drop down and
+  a link was added to open the settings folder
+- using raw view, MediaInfo is now queried only once
+  instead of twice which is marginally more efficient
+- on startup MediaInfo.NET registers itself at
+  HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths\
+  which enables third party apps to find and start MediaInfo.NET
+- a assembly title attribute was added so the shell will use
+  MediaInfo.NET instead of MediaInfoNET (for instance in the
+  Explorer Open with menu)
+- the website was improved and added to the context menu
+- the about dialog shows now the MediaInfo version
+- all message boxes were migrated to use the TaskDialog API
+  which has a improved presentation and copy and supports
+  links in case of an error
+
 ### 5.1
 
 - new setting 'Theme' added with 'Light', 'Dark' and 'System' option,

@@ -170,6 +170,7 @@
                     <ContextMenu>
                         <MenuItem Name="OpenFileMenuItem" Header="Open File..."  InputGestureText="Ctrl+O" Click="OpenFileMenuItem_Click" />
                         <MenuItem Name="SaveMenuItem"     Header="Save File..."  InputGestureText="Ctrl+S" IsEnabled="False" Click="SaveMenuItem_Click" />
+                        <Separator />
                         <MenuItem Name="CopyMenuItem"     Header="Copy"          InputGestureText="Ctrl+C" IsEnabled="False" Click="CopyMenuItem_Click" />
                         <Separator />
                         <MenuItem Name="PreviousMenuItem" Header="Previous File" InputGestureText="F11" IsEnabled="False" Click="PreviousMenuItem_Click" />
@@ -177,6 +178,8 @@
                         <Separator />
                         <MenuItem Name="SetupMenuItem"    Header="Install/Uninstall" Click="SetupMenuItem_Click" />
                         <MenuItem Name="SettingsMenuItem" Header="Settings..."       Click="SettingsMenuItem_Click" />
+                        <Separator />
+                        <MenuItem Name="WebsiteMenuItem"  Header="Website..."        Click="WebsiteMenuItem_Click" />
                         <MenuItem Name="AboutMenuItem"    Header="About..."          Click="AboutMenuItem_Click" />
                     </ContextMenu>
                 </RichTextBox.ContextMenu>

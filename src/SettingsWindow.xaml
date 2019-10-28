@@ -10,6 +10,7 @@
         Width="550"
         FontSize="14"
         Background="LightGray"
+        SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         PreviewKeyDown="SettingsWindow_PreviewKeyDown"
@@ -18,18 +19,18 @@
     <Grid>
         <StackPanel Margin="20">
             <CheckBox IsChecked="{Binding RawView}" Margin="5">Show parameter names as they are used in the MediaInfo API</CheckBox>
-            <CheckBox IsChecked="{Binding ShowCompactSummary}" Margin="5">Show compact summary on top of basic tab</CheckBox>
+            <CheckBox IsChecked="{Binding CompactSummary}" Margin="5">Show compact summary on top of basic tab</CheckBox>
             <CheckBox IsChecked="{Binding WordWrap}" Margin="5">Word Wrap</CheckBox>
             <CheckBox IsChecked="{Binding CenterScreen}" Margin="5">Start app in center of screen</CheckBox>
             <CheckBox IsChecked="{Binding FormatEncoded}" Margin="5">Show special presentation of encoding settings</CheckBox>
 
             <StackPanel Orientation="Horizontal">
-                <Label VerticalAlignment="Center" Width="110">Theme:</Label>
+                <Label VerticalAlignment="Center"
+                       Width="110">Color Theme:</Label>
                 <ComboBox SelectedValue="{Binding Theme}"
                           SelectedValuePath="Content"
-                          Width="130"
-                          Height="25"
-                          HorizontalContentAlignment="Center">
+                          Width="120"
+                          Height="25">
                     <ComboBoxItem>Light</ComboBoxItem>
                     <ComboBoxItem>Dark</ComboBoxItem>
                     <ComboBoxItem>System</ComboBoxItem>
@@ -37,13 +38,14 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
-                <Label VerticalAlignment="Center" Width="110">Font:</Label>
-                <TextBox Name="FontTextBox"
-                         Text="{Binding FontName}"
-                         VerticalContentAlignment="Center"
-                         HorizontalContentAlignment="Center"
-                         Width="130"
-                         Height="25"/>
+                <Label VerticalAlignment="Center"
+                       Width="110">Font:</Label>
+                <ComboBox Name="FontComboBox"
+                          SelectedItem="{Binding FontName}"
+                          VerticalContentAlignment="Center"
+                          Width="Auto"
+                          MinWidth="120"
+                          Height="25"/>
                 <TextBox Name="FontSizeTextBox"
                          Text="{Binding FontSize}"
                          VerticalContentAlignment="Center"
@@ -51,11 +53,10 @@
                          Margin="5 0 0 0"
                          Width="40"
                          Height="25"/>
-                <Button Name="FontButton"
-                        Width="30"
-                        Height="25"
-                        Margin="5 0 0 0"
-                        Click="FontButton_Click">...</Button>
+                <TextBlock FontFamily="{Binding Text, ElementName=FontComboBox}"
+                           FontSize="{Binding Text, ElementName=FontSizeTextBox}"
+                           VerticalAlignment="Center"
+                           Margin="10 0 0 0">Preview</TextBlock>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
@@ -74,7 +75,8 @@
                          HorizontalContentAlignment="Center"
                          Width="50"
                          Height="25"/>
-                <Label VerticalAlignment="Center">x</Label>
+                <Label VerticalAlignment="Center"
+                       FontFamily="Segoe MDL2 Assets" >&#xE947;</Label>
                 <TextBox Text="{Binding WindowHeight}"
                          VerticalContentAlignment="Center"
                          HorizontalContentAlignment="Center"
@@ -87,17 +89,30 @@
                        xml:space="preserve">Parameters&#10;to hide&#10;(one per line):</Label>
                 <TextBox Text="{Binding Exclude}"
                          AcceptsReturn="True"
-                         Width="250"
+                         VerticalScrollBarVisibility="Auto"
+                         Width="360"
                          Height="65"
                          Margin="0 2 0 0"/>               
             </StackPanel>
-           
-            <Label>File Types to install:</Label>           
-            <TextBox Text="{Binding FileTypes}"
-                     TextWrapping="Wrap"
-                     Height="65"
-                     HorizontalAlignment="Stretch"
-                     Margin="0 3 0 0"/>
+
+            <StackPanel Orientation="Horizontal">
+                <Label Width="110"
+                       xml:space="preserve">File Types&#10;to install:</Label>
+                <TextBox Text="{Binding FileTypes}"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto"
+                         Width="360"
+                         Height="65"
+                         Margin="0 3 0 0"/>
+            </StackPanel>
+
+            <TextBlock Margin="5">           
+                <Hyperlink Name="OpenSettingsFolderHyperlink"
+                           Click="OpenSettingsFolderHyperlink_Click">
+                    
+                    Open settings folder in File Explorer
+                </Hyperlink>
+            </TextBlock>
         </StackPanel>
     </Grid>
 </Window>

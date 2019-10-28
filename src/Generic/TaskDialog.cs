@@ -429,7 +429,12 @@ public class TaskDialog<T> : TaskDialogNative, IDisposable
                 string stringUni = Marshal.PtrToStringUni(lParam) ?? "";
 
                 if (stringUni.StartsWith("mailto") || stringUni.StartsWith("http"))
-                    Process.Start(stringUni);
+                {
+                    Process.Start(new ProcessStartInfo() {
+                        UseShellExecute = true,
+                        FileName = stringUni
+                    });
+                }
 
                 if (stringUni == "copymsg")
                 {
@@ -542,11 +547,10 @@ public class TaskDialogNative
         IntPtr lParam);
 
     [DllImport("kernel32.dll")]
-    [PreserveSig]
     public static extern uint GetModuleFileName(
-        [In] IntPtr hModule,
-        [Out] StringBuilder lpFilename,
-        [In, MarshalAs(UnmanagedType.U4)] int nSize);
+        [In] IntPtr module,
+        [Out] StringBuilder path,
+        [In, MarshalAs(UnmanagedType.U4)] int size);
 
     [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
     public class TASKDIALOGCONFIG

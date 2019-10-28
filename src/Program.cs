@@ -1,8 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Windows;
 using WinForms = System.Windows.Forms;
 
 namespace MediaInfoNET
@@ -14,9 +12,11 @@ namespace MediaInfoNET
         {
             try
             {
+                WinForms.Application.SetHighDpiMode(WinForms.HighDpiMode.PerMonitorV2);
+                Msg.SupportURL = "https://github.com/stax76/MediaInfo.NET/issues";
+
                 if (!File.Exists(App.SettingsFile))
                 {
-                    WinForms.Application.SetHighDpiMode(WinForms.HighDpiMode.SystemAware);
 
                     using TaskDialog<string> td = new TaskDialog<string>();
                     td.MainInstruction = "Choose a settings directory.";
@@ -57,7 +57,7 @@ namespace MediaInfoNET
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, AppHelp.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                Msg.ShowException(ex);
             }
         }
 
@@ -67,8 +67,6 @@ namespace MediaInfoNET
 
             if (install)
             {
-                string exePath = Process.GetCurrentProcess().MainModule.FileName;
-
                 foreach (string ext in extensions)
                 {
                     string filekeyName = RegistryHelp.GetString(@"HKCR\." + ext, null);
@@ -80,10 +78,10 @@ namespace MediaInfoNET
                     }
 
                     RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET", null, "MediaInfo");
-                    RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET\command", null, $"\"{exePath}\" \"%1\"");
+                    RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET\command", null, $"\"{AppHelp.ExecutablePath}\" \"%1\"");
                 }
 
-                MessageBox.Show("Install complete", AppHelp.ProductName, MessageBoxButton.OK, MessageBoxImage.Information);
+                Msg.Show("Install complete");
             }
             else
             {
@@ -95,7 +93,7 @@ namespace MediaInfoNET
                     RegistryHelp.RemoveKey(@"HKCR\" + RegistryHelp.GetString(@"HKCR\" + name, null) + @"\shell\MediaInfo.NET");
                 }
 
-                MessageBox.Show("Uninstall complete", AppHelp.ProductName, MessageBoxButton.OK, MessageBoxImage.Information);
+                Msg.Show("Uninstall complete");
             }
         }
     }

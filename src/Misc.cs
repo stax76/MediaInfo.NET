@@ -4,7 +4,7 @@
 public class AppSettings
 {
     public bool RawView { get; set; } = true;
-    public bool ShowCompactSummary { get; set; } = true;
+    public bool CompactSummary { get; set; } = true;
     public bool WordWrap { get; set; }
     public bool CenterScreen { get; set; } = true;
     public bool FormatEncoded { get; set; } = true;
@@ -26,7 +26,7 @@ public class AppSettings
         Border = "Gray",
         TextSelection = "#535E66",
         ItemSelection = "#A7BCCC",
-        ItemHover = "#C3D7E5",
+        ItemHover = "#B1C8D8",
         Highlight = "Gold"
     };
 

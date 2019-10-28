@@ -45,7 +45,7 @@ namespace MediaInfoNET
 
         void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            MessageBox.Show(e.Exception.ToString(), AppHelp.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+            Msg.ShowException(e.Exception);
         }
     }
 }

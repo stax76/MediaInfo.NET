@@ -12,13 +12,14 @@
     <RootNamespace>MediaInfoNET</RootNamespace>
     <StartupObject>MediaInfoNET.Program</StartupObject>
     <Product>MediaInfo.NET</Product>
+    <AssemblyTitle>MediaInfo.NET</AssemblyTitle>
     <Company>Frank Skare (stax76)</Company>
     <Authors>Frank Skare (stax76)</Authors>
-    <Version>5.1</Version>
-    <AssemblyVersion>5.1.0.0</AssemblyVersion>
+    <Version>5.2</Version>
+    <AssemblyVersion>5.2.0.0</AssemblyVersion>
     <PackageId>MediaInfo.NET</PackageId>
-    <Description>Modern MediaInfo GUI available</Description>
-    <Copyright>2019 Frank Skare (stax76)</Copyright>
+    <Description>Modern MediaInfo GUI</Description>
+    <Copyright>Copyright 2002-2019 Frank Skare (stax76)</Copyright>
     <ApplicationManifest>App.manifest</ApplicationManifest>
   </PropertyGroup>
   

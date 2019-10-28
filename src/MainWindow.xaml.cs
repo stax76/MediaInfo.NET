@@ -35,11 +35,21 @@ namespace MediaInfoNET
             InitializeComponent();
             DataContext = this;
             ApplySettings();
+            WriteShellRegistryKey();
 
             if (Environment.GetCommandLineArgs().Length > 1)
                 LoadFile(Environment.GetCommandLineArgs()[1]);
             else
                 SetText("Drag files here or right-click.");
+        }
+
+        void WriteShellRegistryKey()
+        {
+            string keyPath = @"HKCU\Software\Microsoft\Windows\CurrentVersion\App Paths\" +
+                Path.GetFileName(AppHelp.ExecutablePath);
+            
+            if (!File.Exists(RegistryHelp.GetString(keyPath, null)))
+                RegistryHelp.SetValue(keyPath, null, AppHelp.ExecutablePath);
         }
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -278,7 +288,7 @@ namespace MediaInfoNET
             StringBuilder sb = new StringBuilder();
             IEnumerable<MediaInfoParameter> items;
 
-            if (ActiveGroup == "Basic" && App.Settings.ShowCompactSummary)
+            if (ActiveGroup == "Basic" && App.Settings.CompactSummary)
             {
                 List<string> values = new List<string>();
 
@@ -626,7 +636,7 @@ namespace MediaInfoNET
                 {
                     using Process proc = new Process();
                     proc.StartInfo.UseShellExecute = true;
-                    proc.StartInfo.FileName = Process.GetCurrentProcess().MainModule.FileName;
+                    proc.StartInfo.FileName = AppHelp.ExecutablePath;
                     proc.StartInfo.Arguments = td.SelectedValue;
                     proc.StartInfo.Verb = "runas";
                     proc.Start();
@@ -959,7 +969,9 @@ namespace MediaInfoNET
         private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Msg.Show(AppHelp.ProductName + " " + WinForms.Application.ProductVersion,
-                "Copyright © 2008-2019 Frank Skare (stax76)\n\nMIT License");
+                "MediaInfo " + FileVersionInfo.GetVersionInfo(WinForms.Application
+                .StartupPath + @"\MediaInfo.dll").ProductVersion +
+                "\n\nCopyright 2002-2019 Frank Skare (stax76)\n\nMIT License");
         }
 
         bool WasActivated;
@@ -977,6 +989,14 @@ namespace MediaInfoNET
         {
             await Task.Run(new Action(() => Thread.Sleep(500)));
             Activate();
+        }
+
+        private void WebsiteMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo() {
+                UseShellExecute = true,
+                FileName = "https://github.com/stax76/MediaInfo.NET"
+            });
         }
     }
 }
