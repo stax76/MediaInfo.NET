@@ -1,6 +1,6 @@
 # MediaInfo.NET
 
-MediaInfo.NET is a modern MediaInfo GUI.
+MediaInfo.NET is a modern MediaInfo GUI for Windows.
 
 ![](Main.png)
 
