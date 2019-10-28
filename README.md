@@ -43,7 +43,7 @@ This enables third party apps to find and start MediaInfo.NET.
 **MediaInfo** is the library which MediaInfo.NET is based on.  
 https://mediaarea.net/en/MediaInfo
 
-**Get-MediaInfo** is a PowerShell advanced function to access MediaInfo properties from media files.  
+**Get-MediaInfo** is a PowerShell advanced function to access MediaInfo properties from media files via PowerShell.  
 https://github.com/stax76/Get-MediaInfo
 
 **StaxRip** is a encoding GUI that integrates MediaInfo.NET.  
