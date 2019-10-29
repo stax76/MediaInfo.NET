@@ -1,3 +1,10 @@
+###
+
+- in normal view language names are shown instead of
+  two letter language codes
+- MediaInfo API spelling errors are corrected
+- duplicated entries are removed
+
 ### 5.2
 
 - in the settings dialog the layout was improved,

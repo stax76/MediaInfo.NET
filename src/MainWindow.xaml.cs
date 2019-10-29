@@ -187,6 +187,8 @@ namespace MediaInfoNET
             for (int i = 0; i < exclude.Length; i++)
                 exclude[i] = exclude[i].Trim();
 
+            List<string> added = new List<string>();
+
             foreach (string line in summary.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (line.Contains(":"))
@@ -201,7 +203,12 @@ namespace MediaInfoNET
                     item.Group = group;
                     item.IsComplete = true;
                     Fix(item, rawView);
-                    items.Add(item);
+                    string addedKey = item.Name + item.Value + item.Group;
+
+                    if (!added.Contains(addedKey))
+                        items.Add(item);
+
+                    added.Add(addedKey);
                 }
                 else
                     group = line.Trim();
@@ -233,36 +240,36 @@ namespace MediaInfoNET
 
         void Fix(MediaInfoParameter item, bool rawView)
         {
-            if (item.Name.StartsWith("FrameRate/"))
+            void FixS(MediaInfoParameter item, string prefix, string replace = "s")
             {
-                if (item.Value.Contains("fps1"))
-                    item.Value = item.Value.Replace("fps1", "FPS");
-                else if (item.Value.Contains("fps2"))
-                    item.Value = item.Value.Replace("fps2", "FPS");
-                else if (item.Value.Contains("fps3"))
-                    item.Value = item.Value.Replace("fps3", "FPS");
+                for (int i = 0; i < 4; i++)
+                    if (item.Value.Contains(prefix + i))
+                        item.Value = item.Value.Replace(prefix + i, prefix + replace);
             }
-            else if ((item.Name.StartsWith("Width/") || item.Name.StartsWith("Height/")) &&
-                item.Value.Contains("pixel3"))
 
-                item.Value = item.Value.Replace("pixel3", "pixels");
+            if (item.Name.StartsWith("FrameRate/") || item.Name.StartsWith("Frame rate"))
+                FixS(item, "fps", "");
+            else if (item.Name.StartsWith("Width") || item.Name.StartsWith("Height"))
+                FixS(item, "pixel");
             else if (item.Name.Contains("Channel"))
-            {
-                if (item.Value.Contains("channel1"))
-                    item.Value = item.Value.Replace("channel1", "channels");
-                else if (item.Value.Contains("channel2"))
-                    item.Value = item.Value.Replace("channel2", "channels");
-                else if (item.Value.Contains("channel3"))
-                    item.Value = item.Value.Replace("channel3", "channels");
-            }
-            else if (item.Name.StartsWith("BitDepth/") && item.Value.Contains("bit3"))
-                item.Value = item.Value.Replace("bit3", "bits");
+                FixS(item, "channel");
+            else if (item.Name.StartsWith("Bit"))
+                FixS(item, "bit");
+            else if (item.Name.Contains("Size", StringComparison.OrdinalIgnoreCase))
+                FixS(item, "Byte");
             else if ((item.Name == "Encoded_Library_Settings" || item.Name == "Encoding settings")
                 && App.Settings.FormatEncoded)
 
                 Format_Encoded_Library_Settings(item);
             else if (!rawView && item.Name == "Language" && item.Value.Length == 2)
                 item.Value = GetLanguageName(item.Value);
+            else if (item.Name.StartsWith("Format settings") || item.Name.StartsWith("Format_Settings"))
+            {
+                if (item.Name.Contains("Reference frames"))
+                    item.Name = item.Name.Replace("Reference frames", "ref frames");
+
+                FixS(item, "frame");
+            }
         }
 
         string GetLanguageName(string id)
