@@ -1,9 +1,9 @@
-###
+### 5.3
 
-- in normal view language names are shown instead of
-  two letter language codes
-- MediaInfo API spelling errors are corrected
-- duplicated entries are removed
+- in normal view language names are now shown instead of two letter language codes
+- MediaInfo API spelling errors were corrected
+- duplicated entries are now removed
+- critical fix: file associations did not work when UserChoice key was defined
 
 ### 5.2
 

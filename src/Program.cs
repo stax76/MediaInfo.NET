@@ -79,6 +79,14 @@ namespace MediaInfoNET
 
                     RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET", null, "MediaInfo");
                     RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET\command", null, $"\"{AppHelp.ExecutablePath}\" \"%1\"");
+
+                    string userKeyName = RegistryHelp.GetString(@$"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.{ext}\UserChoice", "ProgId");
+                    
+                    if (RegistryHelp.GetString(@"HKCR\" + userKeyName + @"\shell\open\command", null) != "")
+                    {
+                        RegistryHelp.SetValue(@"HKCR\" + userKeyName + @"\shell\MediaInfo.NET", null, "MediaInfo");
+                        RegistryHelp.SetValue(@"HKCR\" + userKeyName + @"\shell\MediaInfo.NET\command", null, $"\"{AppHelp.ExecutablePath}\" \"%1\"");
+                    }
                 }
 
                 Msg.Show("Install complete");
@@ -91,6 +99,20 @@ namespace MediaInfoNET
                         continue;
 
                     RegistryHelp.RemoveKey(@"HKCR\" + RegistryHelp.GetString(@"HKCR\" + name, null) + @"\shell\MediaInfo.NET");
+                }
+
+                using RegistryKey fileExtsKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts");
+
+                if (fileExtsKey != null)
+                {
+                    foreach (string name in fileExtsKey.GetSubKeyNames())
+                    {
+                        if (!name.StartsWith("."))
+                            continue;
+
+                        string userKeyName = RegistryHelp.GetString(@$"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{name}\UserChoice", "ProgId");
+                        RegistryHelp.RemoveKey(@"HKCR\" + userKeyName + @"\shell\MediaInfo.NET");
+                    }
                 }
 
                 Msg.Show("Uninstall complete");
