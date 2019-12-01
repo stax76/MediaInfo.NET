@@ -1,3 +1,8 @@
+###
+
+- the navigation tab bar was only showing the format family
+  like DTS, now it's showing the exact format like DTS XLL
+
 ### 5.3
 
 - in normal view language names are now shown instead of two letter language codes

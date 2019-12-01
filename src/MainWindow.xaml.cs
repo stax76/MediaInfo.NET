@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -16,6 +16,8 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+
+using Microsoft.Win32;
 using WinForms = System.Windows.Forms;
 
 namespace MediaInfoNET
@@ -157,8 +159,8 @@ namespace MediaInfoNET
                 tabItems.Add(new TabItem { Name = name, Value = name });
 
             foreach (TabItem tabItem in tabItems)
-                foreach (MediaInfoParameter item in Items)
-                    if (item.Group == tabItem.Name && item.Name == "Format")
+                foreach (MediaInfoParameter item in ItemsRaw)
+                    if (item.Group == tabItem.Name && item.Name == "Format/String")
                         tabItem.Name += " (" + item.Value + ")";
 
             TabListBox.ItemsSource = tabItems;
