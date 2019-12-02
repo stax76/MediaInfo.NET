@@ -15,6 +15,7 @@ MediaInfo.NET is a modern MediaInfo GUI for Windows.
 - Many settings to change the appearance
 - Special presentation for encoding settings
 - Compact summary
+- Update check and routine
 
 ## Installation
 

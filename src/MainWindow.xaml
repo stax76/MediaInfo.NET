@@ -182,6 +182,7 @@
                         <MenuItem Name="SettingsMenuItem" Header="Settings..."       Click="SettingsMenuItem_Click" />
                         <Separator />
                         <MenuItem Name="WebsiteMenuItem"  Header="Website..."        Click="WebsiteMenuItem_Click" />
+                        <MenuItem Name="UpdateMenuItem"   Header="Check for updates" Click="UpdateMenuItem_Click" />
                         <MenuItem Name="AboutMenuItem"    Header="About..."          Click="AboutMenuItem_Click" />
                     </ContextMenu>
                 </RichTextBox.ContextMenu>

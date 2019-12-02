@@ -1,7 +1,11 @@
-###
+
+### 5.4
 
 - the navigation tab bar was only showing the format family
   like DTS, now it's showing the exact format like DTS XLL
+- new: update check, must first be enabled in settings
+- new: update feature, requires PowerShell 5 and curl,
+       an up to date Windows 10 system has both included
 
 ### 5.3
 

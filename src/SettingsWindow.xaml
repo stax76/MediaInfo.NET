@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         
         Title="Settings"
-        Height="470"
+        Height="480"
         Width="550"
         FontSize="14"
         Background="LightGray"
@@ -18,6 +18,7 @@
 
     <Grid>
         <StackPanel Margin="20">
+            <CheckBox IsChecked="{Binding CheckForUpdates}" Margin="5">Check for updates</CheckBox>
             <CheckBox IsChecked="{Binding RawView}" Margin="5">Show parameter names as they are used in the MediaInfo API</CheckBox>
             <CheckBox IsChecked="{Binding CompactSummary}" Margin="5">Show compact summary on top of basic tab</CheckBox>
             <CheckBox IsChecked="{Binding WordWrap}" Margin="5">Word Wrap</CheckBox>

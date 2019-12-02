@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 
 [Serializable()]
 public class AppSettings
@@ -8,7 +9,8 @@ public class AppSettings
     public bool WordWrap { get; set; }
     public bool CenterScreen { get; set; } = true;
     public bool FormatEncoded { get; set; }
-    
+    public bool CheckForUpdates { get; set; }
+
     public int WindowWidth { get; set; } = 750;
     public int WindowHeight { get; set; } = 550;
     public int ColumnPadding { get; set; } = 32;

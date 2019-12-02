@@ -38,6 +38,7 @@ namespace MediaInfoNET
             DataContext = this;
             ApplySettings();
             WriteShellRegistryKey();
+            UpdateCheck.Updating += () => Dispatcher.Invoke(() => Close());
 
             if (Environment.GetCommandLineArgs().Length > 1)
                 LoadFile(Environment.GetCommandLineArgs()[1]);
@@ -994,7 +995,7 @@ namespace MediaInfoNET
             Msg.Show(AppHelp.ProductName + " " + WinForms.Application.ProductVersion,
                 "MediaInfo " + FileVersionInfo.GetVersionInfo(WinForms.Application
                 .StartupPath + @"\MediaInfo.dll").ProductVersion +
-                "\n\nCopyright 2002-2019 Frank Skare (stax76)\n\nMIT License");
+                "\n\nCopyright (C) 2019 Frank Skare (stax76)\n\nMIT License");
         }
 
         bool WasActivated;
@@ -1012,6 +1013,7 @@ namespace MediaInfoNET
         {
             await Task.Run(new Action(() => Thread.Sleep(500)));
             Activate();
+            UpdateCheck.DailyCheck();
         }
 
         private void WebsiteMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1020,6 +1022,11 @@ namespace MediaInfoNET
                 UseShellExecute = true,
                 FileName = "https://github.com/stax76/MediaInfo.NET"
             });
+        }
+
+        private void UpdateMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateCheck.CheckOnline(true);
         }
     }
 }
