@@ -21,10 +21,10 @@ namespace MediaInfoNET
 
                     using TaskDialog<string> td = new TaskDialog<string>();
                     td.MainInstruction = "Choose a settings directory.";
-                    td.AddCommandLink("AppData");
-                    td.AddCommandLink("Portable");
-                    td.AddCommandLink("Custom");
-                    td.AddCommandLink("Cancel");
+                    td.AddCommand("AppData");
+                    td.AddCommand("Portable");
+                    td.AddCommand("Custom");
+                    td.AddCommand("Cancel");
                     td.Show();
 
                     if (string.IsNullOrEmpty(td.SelectedValue) || td.SelectedValue == "Cancel")

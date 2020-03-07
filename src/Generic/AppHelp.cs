@@ -16,7 +16,7 @@ class AppHelp
         get {
             if (_ExecutablePath == "")
             {
-                StringBuilder sb = new StringBuilder(260);
+                StringBuilder sb = new StringBuilder(500);
                 TaskDialogNative.GetModuleFileName(IntPtr.Zero, sb, sb.Capacity);
                 _ExecutablePath = sb.ToString();
             }

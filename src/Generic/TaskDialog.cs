@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Collections.Generic;
@@ -362,12 +363,12 @@ public class TaskDialog<T> : TaskDialogNative, IDisposable
         return value;
     }
 
-    public void AddCommandLink(T value)
+    public void AddCommand(T value)
     {
-        AddCommandLink(value?.ToString() ?? "", value);
+        AddCommand(value?.ToString() ?? "", value);
     }
 
-    public void AddCommandLink(string text, T value)
+    public void AddCommand(string text, T value)
     {
         int n = 1000 + IdValueDic.Count + 1;
         IdValueDic[n] = value;
@@ -376,12 +377,17 @@ public class TaskDialog<T> : TaskDialogNative, IDisposable
         Config.dwFlags |= TaskDialogNative.TASKDIALOG_FLAGS.TDF_USE_COMMAND_LINKS;
     }
 
-    public void AddCommandLink(string text, string description, T value, bool setShield = false)
+    public void AddCommand(string text, string description, T value, bool setShield = false)
     {
         int n = 1000 + IdValueDic.Count + 1;
         IdValueDic[n] = value;
-        if (setShield) CommandLinkShieldList.Add(n);
-        if (!string.IsNullOrEmpty(description)) text += "\n" + description;
+
+        if (setShield)
+            CommandLinkShieldList.Add(n);
+
+        if (!string.IsNullOrEmpty(description))
+            text += "\n" + description;
+
         Buttons.Add(new TaskDialogNative.TASKDIALOG_BUTTON(n, text));
         Config.dwFlags |= TaskDialogNative.TASKDIALOG_FLAGS.TDF_USE_COMMAND_LINKS;
     }

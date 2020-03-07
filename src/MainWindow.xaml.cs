@@ -669,12 +669,11 @@ namespace MediaInfoNET
             using TaskDialog<string> td = new TaskDialog<string>();
             td.MainInstruction = "Register or unregister file associations?";
             td.Content = "Add/remove MediaInfo.NET in File Explorer context menu.";
-            td.AddCommandLink("Register file associations", "--install");
-            td.AddCommandLink("Unregister file associations", "--uninstall");
-            td.AddCommandLink("Cancel");
-            td.Show();
+            td.AddCommand("Register file associations", "", "--install", true);
+            td.AddCommand("Unregister file associations", "", "--uninstall", true);
+            td.AddCommand("Cancel");
 
-            if ((td.SelectedValue ?? "").StartsWith("--"))
+            if ((td.Show() ?? "").StartsWith("--"))
             {
                 try
                 {
