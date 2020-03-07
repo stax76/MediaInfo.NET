@@ -4,38 +4,34 @@ using System.Runtime.InteropServices;
 
 public class MediaInfo : IDisposable
 {
-    IntPtr Handle;
-    static bool Loaded;
+    IntPtr MediaInfoHandle;
+    IntPtr ModulInfoHandle;
 
     public MediaInfo(string path)
     {
-        if (!Loaded)
-        {
-            if (LoadLibrary("MediaInfo.dll") == IntPtr.Zero)
+        if (ModulInfoHandle == IntPtr.Zero)
+            if ((ModulInfoHandle = LoadLibrary("MediaInfo.dll")) == IntPtr.Zero)
                 throw new Exception("Error LoadLibrary MediaInfo.dll");
 
-            Loaded = true;
-        }
+        MediaInfoHandle = MediaInfo_New();
 
-        Handle = MediaInfo_New();
-
-        if (Handle == IntPtr.Zero)
+        if (MediaInfoHandle == IntPtr.Zero)
             throw new Exception("Error MediaInfo_New");
 
-        if (MediaInfo_Open(Handle, path) == 0)
+        if (MediaInfo_Open(MediaInfoHandle, path) == 0)
             throw new Exception("Error MediaInfo_Open");
     }
 
     public string GetInfo(MediaInfoStreamKind streamKind, int streamNumber, string parameter)
     {
-        return Marshal.PtrToStringUni(MediaInfo_Get(Handle, streamKind, streamNumber, parameter, MediaInfoInfoKind.Text, MediaInfoInfoKind.Name)) ?? "";
+        return Marshal.PtrToStringUni(MediaInfo_Get(MediaInfoHandle, streamKind, streamNumber, parameter, MediaInfoInfoKind.Text, MediaInfoInfoKind.Name)) ?? "";
     }
 
     public string GetSummary(bool complete, bool rawView)
     {
-        MediaInfo_Option(Handle, "Language", rawView ? "raw" : "");
-        MediaInfo_Option(Handle, "Complete", complete ? "1" : "0");
-        return Marshal.PtrToStringUni(MediaInfo_Inform(Handle, 0)) ?? "";
+        MediaInfo_Option(MediaInfoHandle, "Language", rawView ? "raw" : "");
+        MediaInfo_Option(MediaInfoHandle, "Complete", complete ? "1" : "0");
+        return Marshal.PtrToStringUni(MediaInfo_Inform(MediaInfoHandle, 0)) ?? "";
     }
 
     bool Disposed;
@@ -44,10 +40,10 @@ public class MediaInfo : IDisposable
     {
         if (!Disposed)
         {
-            if (Handle != IntPtr.Zero)
+            if (MediaInfoHandle != IntPtr.Zero)
             {
-                MediaInfo_Close(Handle);
-                MediaInfo_Delete(Handle);
+                MediaInfo_Close(MediaInfoHandle);
+                MediaInfo_Delete(MediaInfoHandle);
             }
 
             Disposed = true;
@@ -78,17 +74,17 @@ public class MediaInfo : IDisposable
     static extern void MediaInfo_Delete(IntPtr handle);
 
     [DllImport("MediaInfo.dll", CharSet = CharSet.Unicode)]
-    static extern IntPtr MediaInfo_Get(IntPtr handle,
-                                       MediaInfoStreamKind streamKind,
-                                       int streamNumber,
-                                       string parameter,
-                                       MediaInfoInfoKind kindOfInfo,
-                                       MediaInfoInfoKind kindOfSearch);
+    static extern IntPtr MediaInfo_Get(
+        IntPtr handle,
+        MediaInfoStreamKind streamKind,
+        int streamNumber,
+        string parameter,
+        MediaInfoInfoKind kindOfInfo,
+        MediaInfoInfoKind kindOfSearch);
 
     [DllImport("MediaInfo.dll", CharSet = CharSet.Unicode)]
-    static extern int MediaInfo_Count_Get(IntPtr handle,
-                                          MediaInfoStreamKind streamKind,
-                                          int streamNumber);
+    static extern int MediaInfo_Count_Get(
+        IntPtr handle, MediaInfoStreamKind streamKind, int streamNumber);
 }
 
 public enum MediaInfoStreamKind

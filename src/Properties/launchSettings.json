@@ -2,7 +2,7 @@
   "profiles": {
     "MediaInfo.NET": {
       "commandName": "Project",
-      "commandLineArgs": "\"D:\\Samples\\Brot und Spiele.mp4\""
+      "commandLineArgs": "\"D:\\Samples\\ASS.mkv\""
     }
   }
 }

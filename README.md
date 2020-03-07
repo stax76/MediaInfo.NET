@@ -19,7 +19,7 @@ MediaInfo.NET is a modern MediaInfo GUI for Windows.
 
 ## Installation
 
-**[Requires a installed .NET Core 3.0 and .NET Core desktop runtime.](https://dotnet.microsoft.com/download/dotnet-core/3.0/runtime)**
+**[Requires .NET Core 3.1 x86/32bit.](https://dotnet.microsoft.com/download/dotnet-core/current/runtime)**
 
 Run MediaInfo.NET and right-click to show the context menu, choose Install to register file associations, File Explorer will then show a MediaInfo menu item in the context menu when a media file is right-clicked. Alternatively to installing, the Explorer 'Open with' menu or [Open with++](https://github.com/stax76/OpenWithPlusPlus) can be used.
 

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -273,6 +274,22 @@ namespace MediaInfoNET
 
                 FixS(item, "frame");
             }
+            else if (item.Group == "Menu" && item.Name == "00" &&
+                item.Value.Contains("                     : "))
+            {
+                Match match = Regex.Match(item.Value, @"(\d\d:\d\d\.\d\d\d) +: +(.+)");
+
+                if (match.Success)
+                {
+                    item.Name = match.Groups[1].Value;
+                    item.Value = match.Groups[2].Value;
+                }
+
+                match = Regex.Match(item.Value, @"(\w\w:Chapter \d\d) / \w\w:Chapter \d\d");
+
+                if (match.Success)
+                    item.Value = item.Value.Replace(match.Value, match.Groups[1].Value);
+            }
         }
 
         string GetLanguageName(string id)
@@ -385,11 +402,14 @@ namespace MediaInfoNET
                         values.Add(GetValue(group, "Default/String") == "Yes" ? "Default" : "");
                         values.Add(GetValue(group, "Forced/String") == "Yes" ? "Forced" : "");
 
-                        sb.AppendLine("S: " + Join(values));
+                        sb.AppendLine("T: " + Join(values));
                     }
 
                     sb.AppendLine();
                 }
+
+                if (Items.Any(item => item.Group == "Menu"))
+                    sb.AppendLine("M: Menu\r\n");
             }
 
             if (ActiveGroup == "Advanced")
