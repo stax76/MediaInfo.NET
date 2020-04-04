@@ -23,7 +23,7 @@ MediaInfo.NET is a modern MediaInfo GUI for Windows.
 
 Run MediaInfo.NET and right-click to show the context menu, choose Install to register file associations, File Explorer will then show a MediaInfo menu item in the context menu when a media file is right-clicked.
 
-Alternatively to installing, [Open with++](https://github.com/stax76/OpenWithPlusPlus) can be used, it supports icons and is the power user way.
+For real power users there is [Open with++](https://github.com/stax76/OpenWithPlusPlus) for Windows File Explorer integration.
 
 ## Usage
 
