@@ -15,7 +15,8 @@ MediaInfo.NET is a modern MediaInfo GUI for Windows.
 - Many settings to change the appearance
 - Special presentation for encoding settings
 - Compact summary
-- Update check and routine
+- Folder View powered by [PowerShell Out-GridView](https://github.com/stax76/Get-MediaInfo#examples)
+- Update check and PowerShell based update feature
 
 ## Installation
 
