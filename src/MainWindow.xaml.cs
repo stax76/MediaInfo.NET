@@ -141,6 +141,7 @@ namespace MediaInfoNET
                 return;
 
             SaveMenuItem.IsEnabled = true;
+            FolderMenuItem.IsEnabled = true;
             PreviousMenuItem.IsEnabled = Directory.GetFiles(Path.GetDirectoryName(file)).Length > 1;
             NextMenuItem.IsEnabled = PreviousMenuItem.IsEnabled;
             SourcePath = file;
@@ -601,6 +602,8 @@ namespace MediaInfoNET
                     else
                         SearchTextBox.Text = "";
                     break;
+                case Key.F1: ShowWebsite(); break;
+                case Key.F9: FolderView(); break;
                 case Key.F11: Previous(); break;
                 case Key.F12: Next(); break;
                 case Key.O when Keyboard.IsKeyDown(Key.LeftCtrl):
@@ -1014,7 +1017,7 @@ namespace MediaInfoNET
             Msg.Show(AppHelp.ProductName + " " + WinForms.Application.ProductVersion,
                 "MediaInfo " + FileVersionInfo.GetVersionInfo(WinForms.Application
                 .StartupPath + @"\MediaInfo.dll").ProductVersion +
-                "\n\nCopyright (C) 2019 Frank Skare (stax76)\n\nMIT License");
+                "\n\nCopyright (C) 2019-2020 Frank Skare (stax76)\n\nMIT License");
         }
 
         bool WasActivated;
@@ -1037,6 +1040,11 @@ namespace MediaInfoNET
 
         private void WebsiteMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            ShowWebsite();
+        }
+
+        void ShowWebsite()
+        {
             Process.Start(new ProcessStartInfo() {
                 UseShellExecute = true,
                 FileName = "https://github.com/stax76/MediaInfo.NET"
@@ -1046,6 +1054,18 @@ namespace MediaInfoNET
         private void UpdateMenuItem_Click(object sender, RoutedEventArgs e)
         {
             UpdateCheck.CheckOnline(true);
+        }
+
+        private void FolderMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            FolderView();
+        }
+
+        private void FolderView()
+        {
+            string code = ". '" + WinForms.Application.StartupPath + @"Get-MediaInfo\Get-MediaInfo.ps1" +
+                $"'; Get-ChildItem '{Path.GetDirectoryName(SourcePath)}' | Get-MediaInfo | Out-GridView";
+            Process.Start("powershell.exe", "-nologo -noexit -command \"" + code + "\"");
         }
     }
 }

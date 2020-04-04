@@ -10,7 +10,7 @@
         KeyDown="Window_KeyDown"
         Activated="Window_Activated"
         PreviewDragOver="Window_PreviewDragOver">
-   
+
     <Grid FocusManager.FocusedElement="{Binding ElementName=SearchTextBox}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -32,7 +32,7 @@
 
             <Border BorderBrush="{Binding BorderColor}"
                     BorderThickness="0 0 0 1">
-                
+
                 <TextBox Name="SearchTextBox"
                          Height="30"
                          VerticalContentAlignment="Center"
@@ -42,8 +42,8 @@
                          TextChanged="SearchTextBox_TextChanged"
                          Foreground="{Binding Foreground}"
                          CaretBrush="{Binding Foreground}" />
-            </Border>        
-            
+            </Border>
+
             <Button Name="ClearButton"
                     Content="r"
                     HorizontalAlignment="Right"
@@ -55,7 +55,7 @@
                     Height="20"
                     Visibility="Hidden"
                     Click="ClearButton_Click">
-                
+
                 <Button.Style>
                     <Style TargetType="Button">
                         <Setter Property="Background" Value="{Binding Path=ItemHoverColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
@@ -116,8 +116,8 @@
                                         </MultiTrigger.Conditions>
                                         <Setter Property="Background"
                                                 Value="{Binding Path=ItemSelectionColor, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
-                                    </MultiTrigger>                                    
-                                    
+                                    </MultiTrigger>
+
                                     <MultiTrigger>
                                         <MultiTrigger.Conditions>
                                             <Condition Property="Selector.IsSelectionActive"
@@ -152,7 +152,7 @@
                 BorderThickness="1 0 0 0"
                 Grid.Column="1"
                 Grid.RowSpan="2">
-            
+
             <RichTextBox Name="ContentRichTextBox"
                          IsReadOnly="True"
                          HorizontalScrollBarVisibility="Auto"
@@ -177,13 +177,14 @@
                         <Separator />
                         <MenuItem Name="PreviousMenuItem" Header="Previous File" InputGestureText="F11" IsEnabled="False" Click="PreviousMenuItem_Click" />
                         <MenuItem Name="NextMenuItem"     Header="Next File"     InputGestureText="F12" IsEnabled="False" Click="NextMenuItem_Click" />
+                        <MenuItem Name="FolderMenuItem"   Header="Folder View"   InputGestureText="F9"  IsEnabled="False" Click="FolderMenuItem_Click" />
                         <Separator />
                         <MenuItem Name="SetupMenuItem"    Header="Install/Uninstall" Click="SetupMenuItem_Click" />
                         <MenuItem Name="SettingsMenuItem" Header="Settings..."       Click="SettingsMenuItem_Click" />
                         <Separator />
-                        <MenuItem Name="WebsiteMenuItem"  Header="Website..."        Click="WebsiteMenuItem_Click" />
-                        <MenuItem Name="UpdateMenuItem"   Header="Check for updates" Click="UpdateMenuItem_Click" />
-                        <MenuItem Name="AboutMenuItem"    Header="About..."          Click="AboutMenuItem_Click" />
+                        <MenuItem Name="WebsiteMenuItem"  Header="Website..."    InputGestureText="F1" Click="WebsiteMenuItem_Click" />
+                        <MenuItem Name="UpdateMenuItem"   Header="Check for updates"                   Click="UpdateMenuItem_Click" />
+                        <MenuItem Name="AboutMenuItem"    Header="About..."                            Click="AboutMenuItem_Click" />
                     </ContextMenu>
                 </RichTextBox.ContextMenu>
             </RichTextBox>
