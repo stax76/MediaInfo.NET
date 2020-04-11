@@ -10,7 +10,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,7 +24,7 @@ namespace MediaInfoNET
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         string SourcePath = "";
         String ActiveGroup = "";
@@ -39,7 +38,7 @@ namespace MediaInfoNET
             DataContext = this;
             ApplySettings();
             WriteShellRegistryKey();
-            UpdateCheck.Updating += () => Dispatcher.Invoke(() => Close());
+            Update.Updating += () => Dispatcher.Invoke(() => Close());
 
             if (Environment.GetCommandLineArgs().Length > 1)
                 LoadFile(Environment.GetCommandLineArgs()[1]);
@@ -118,13 +117,16 @@ namespace MediaInfoNET
             Width = App.Settings.WindowWidth;
             Height = App.Settings.WindowHeight;
             WindowStartupLocation = App.Settings.CenterScreen ? WindowStartupLocation.CenterScreen : WindowStartupLocation.Manual;
+            Theme theme;
 
-            Theme theme = App.Settings.Theme switch
-            {
-                "Light" => App.Settings.LightTheme,
-                "Dark" => App.Settings.DarkTheme,
-                _ => AppHelp.IsDarkTheme ? App.Settings.DarkTheme : App.Settings.LightTheme
-            };
+            if (App.Settings.Theme == "Light")
+                theme = App.Settings.LightTheme;
+            else if (App.Settings.Theme == "Dark")
+                theme = App.Settings.DarkTheme;
+            else if (AppHelp.IsDarkTheme)
+                theme = App.Settings.DarkTheme;
+            else
+                theme = App.Settings.LightTheme;
 
             Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(theme.Background));
             Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(theme.Foreground));
@@ -183,73 +185,76 @@ namespace MediaInfoNET
         List<MediaInfoParameter> GetItems(bool rawView)
         {
             List<MediaInfoParameter> items = new List<MediaInfoParameter>();
-            using MediaInfo mediaInfo = new MediaInfo(SourcePath);
-            string summary = mediaInfo.GetSummary(true, rawView);
-            string group = "";
-            string[] exclude = App.Settings.Exclude.Split(new[] { '\r', '\n' },
-                StringSplitOptions.RemoveEmptyEntries);
 
-            for (int i = 0; i < exclude.Length; i++)
-                exclude[i] = exclude[i].Trim();
-
-            List<string> added = new List<string>();
-
-            foreach (string line in summary.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+            using (MediaInfo mediaInfo = new MediaInfo(SourcePath))
             {
-                if (line.Contains(":"))
+                string summary = mediaInfo.GetSummary(true, rawView);
+                string group = "";
+                string[] exclude = App.Settings.Exclude.Split(new[] { '\r', '\n' },
+                    StringSplitOptions.RemoveEmptyEntries);
+
+                for (int i = 0; i < exclude.Length; i++)
+                    exclude[i] = exclude[i].Trim();
+
+                List<string> added = new List<string>();
+
+                foreach (string line in summary.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    MediaInfoParameter item = new MediaInfoParameter();
-                    item.Name = line.Substring(0, line.IndexOf(":")).Trim();
+                    if (line.Contains(":"))
+                    {
+                        MediaInfoParameter item = new MediaInfoParameter();
+                        item.Name = line.Substring(0, line.IndexOf(":")).Trim();
 
-                    if (exclude.Contains(item.Name))
-                        continue;
+                        if (exclude.Contains(item.Name))
+                            continue;
 
-                    item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
-                    item.Group = group;
-                    item.IsComplete = true;
-                    Fix(item, rawView);
-                    string addedKey = item.Name + item.Value + item.Group;
+                        item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
+                        item.Group = group;
+                        item.IsComplete = true;
+                        Fix(item, rawView);
+                        string addedKey = item.Name + item.Value + item.Group;
 
-                    if (!added.Contains(addedKey))
+                        if (!added.Contains(addedKey))
+                            items.Add(item);
+
+                        added.Add(addedKey);
+                    }
+                    else
+                        group = line.Trim();
+                }
+
+                summary = mediaInfo.GetSummary(false, rawView);
+
+                foreach (string line in summary.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    if (line.Contains(":"))
+                    {
+                        MediaInfoParameter item = new MediaInfoParameter();
+                        item.Name = line.Substring(0, line.IndexOf(":")).Trim();
+
+                        if (exclude.Contains(item.Name))
+                            continue;
+
+                        item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
+                        item.Group = group;
+                        Fix(item, rawView);
                         items.Add(item);
-
-                    added.Add(addedKey);
+                    }
+                    else
+                        group = line.Trim();
                 }
-                else
-                    group = line.Trim();
+
+                return items;
             }
-
-            summary = mediaInfo.GetSummary(false, rawView);
-
-            foreach (string line in summary.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                if (line.Contains(":"))
-                {
-                    MediaInfoParameter item = new MediaInfoParameter();
-                    item.Name = line.Substring(0, line.IndexOf(":")).Trim();
-
-                    if (exclude.Contains(item.Name))
-                        continue;
-
-                    item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
-                    item.Group = group;
-                    Fix(item, rawView);
-                    items.Add(item);
-                }
-                else
-                    group = line.Trim();
-            }
-
-            return items;
         }
 
         void Fix(MediaInfoParameter item, bool rawView)
         {
-            void FixS(MediaInfoParameter item, string prefix, string replace = "s")
+            void FixS(MediaInfoParameter item2, string prefix, string replace = "s")
             {
                 for (int i = 0; i < 4; i++)
-                    if (item.Value.Contains(prefix + i))
-                        item.Value = item.Value.Replace(prefix + i, prefix + replace);
+                    if (item2.Value.Contains(prefix + i))
+                        item2.Value = item2.Value.Replace(prefix + i, prefix + replace);
             }
 
             if (item.Name.StartsWith("FrameRate/") || item.Name.StartsWith("Frame rate"))
@@ -260,7 +265,7 @@ namespace MediaInfoNET
                 FixS(item, "channel");
             else if (item.Name.StartsWith("Bit"))
                 FixS(item, "bit");
-            else if (item.Name.Contains("Size", StringComparison.OrdinalIgnoreCase))
+            else if (item.Name.Contains("Size"))
                 FixS(item, "Byte");
             else if ((item.Name == "Encoded_Library_Settings" || item.Name == "Encoding settings")
                 && App.Settings.FormatEncoded)
@@ -492,7 +497,7 @@ namespace MediaInfoNET
 
         void Highlight(TextPointer startPos, TextPointer endPos, string find)
         {
-            TextRange? findRange = FindTextInRange(new TextRange(startPos, endPos), find);
+            TextRange findRange = FindTextInRange(new TextRange(startPos, endPos), find);
 
             if (findRange != null)
             {
@@ -501,7 +506,7 @@ namespace MediaInfoNET
             }
         }
 
-        TextRange? FindTextInRange(TextRange searchRange, string searchText)
+        TextRange FindTextInRange(TextRange searchRange, string searchText)
         {
             int offset = searchRange.Text.IndexOf(searchText, StringComparison.OrdinalIgnoreCase);
 
@@ -669,24 +674,28 @@ namespace MediaInfoNET
 
         void SetupMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            using TaskDialog<string> td = new TaskDialog<string>();
-            td.MainInstruction = "Register or unregister file associations?";
-            td.Content = "Add/remove MediaInfo.NET in File Explorer context menu.";
-            td.AddCommand("Register file associations", "", "--install", true);
-            td.AddCommand("Unregister file associations", "", "--uninstall", true);
-            td.AddCommand("Cancel");
-
-            if ((td.Show() ?? "").StartsWith("--"))
+            using (TaskDialog<string> td = new TaskDialog<string>())
             {
-                try
+                td.MainInstruction = "Register or unregister file associations?";
+                td.Content = "Add/remove MediaInfo.NET in File Explorer context menu.";
+                td.AddCommand("Register file associations", "", "--install", true);
+                td.AddCommand("Unregister file associations", "", "--uninstall", true);
+                td.AddCommand("Cancel");
+
+                if ((td.Show() ?? "").StartsWith("--"))
                 {
-                    using Process proc = new Process();
-                    proc.StartInfo.UseShellExecute = true;
-                    proc.StartInfo.FileName = AppHelp.ExecutablePath;
-                    proc.StartInfo.Arguments = td.SelectedValue;
-                    proc.StartInfo.Verb = "runas";
-                    proc.Start();
-                } catch {}
+                    try
+                    {
+                        using (Process proc = new Process())
+                        {
+                            proc.StartInfo.UseShellExecute = true;
+                            proc.StartInfo.FileName = AppHelp.ExecutablePath;
+                            proc.StartInfo.Arguments = td.SelectedValue;
+                            proc.StartInfo.Verb = "runas";
+                            proc.Start();
+                        }
+                    } catch {}
+                }
             }
         }
 
@@ -912,7 +921,7 @@ namespace MediaInfoNET
 
             Dictionary<string, string> sourceDictionary = new Dictionary<string, string>();
             
-            foreach (string value in item.Value.Split(" / "))
+            foreach (string value in item.Value.Split(new [] { " / " }, StringSplitOptions.None))
             {
                 if (value.Contains("="))
                 {
@@ -946,7 +955,7 @@ namespace MediaInfoNET
             ((List<string>)(targetDictionary["Other"])).Sort();
             string text = "\r\n";
 
-            foreach (string? key in targetDictionary.Keys)
+            foreach (string key in targetDictionary.Keys)
             {
                 List<string> list = (List<string>)targetDictionary[key];
 
@@ -975,7 +984,7 @@ namespace MediaInfoNET
             item.Value = text;
         }
 
-        private void OpenFileMenuItem_Click(object sender, RoutedEventArgs e)
+        void OpenFileMenuItem_Click(object sender, RoutedEventArgs e)
         {
             OpenFile();
         }
@@ -988,12 +997,12 @@ namespace MediaInfoNET
                 LoadFile(dialog.FileName);
         }
 
-        private void SaveMenuItem_Click(object sender, RoutedEventArgs e)
+        void SaveMenuItem_Click(object sender, RoutedEventArgs e)
         {
             SaveFile();
         }
 
-        private void SaveFile()
+        void SaveFile()
         {
             SaveFileDialog dialog = new SaveFileDialog();
 
@@ -1012,7 +1021,7 @@ namespace MediaInfoNET
                 ContentRichTextBox.Document.ContentEnd).Text;
         }
 
-        private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
+        void AboutMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Msg.Show(AppHelp.ProductName + " " + WinForms.Application.ProductVersion,
                 "MediaInfo " + FileVersionInfo.GetVersionInfo(WinForms.Application
@@ -1020,25 +1029,12 @@ namespace MediaInfoNET
                 "\n\nCopyright (C) 2019-2020 Frank Skare (stax76)\n\nMIT License");
         }
 
-        bool WasActivated;
-
-        private void Window_Activated(object sender, EventArgs e)
+        void Window_Activated(object sender, EventArgs e)
         {
-            if (!WasActivated)
-            {
-                ActivateWindow();
-                WasActivated = true;
-            }
+            Update.Check();
         }
 
-        async void ActivateWindow()
-        {
-            await Task.Run(new Action(() => Thread.Sleep(500)));
-            Activate();
-            UpdateCheck.DailyCheck();
-        }
-
-        private void WebsiteMenuItem_Click(object sender, RoutedEventArgs e)
+        void WebsiteMenuItem_Click(object sender, RoutedEventArgs e)
         {
             ShowWebsite();
         }
@@ -1051,21 +1047,20 @@ namespace MediaInfoNET
             });
         }
 
-        private void UpdateMenuItem_Click(object sender, RoutedEventArgs e)
+        void UpdateMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            UpdateCheck.CheckOnline(true);
+            Update.CheckOnline(true);
         }
 
-        private void FolderMenuItem_Click(object sender, RoutedEventArgs e)
+        void FolderMenuItem_Click(object sender, RoutedEventArgs e)
         {
             FolderView();
         }
 
-        private void FolderView()
+        void FolderView()
         {
-            string code = ". '" + WinForms.Application.StartupPath + @"Get-MediaInfo\Get-MediaInfo.ps1" +
-                $"'; Get-ChildItem '{Path.GetDirectoryName(SourcePath)}' | Get-MediaInfo | Out-GridView";
-            Process.Start("powershell.exe", "-nologo -noexit -command \"" + code + "\"");
+            Task.Run(() => PowerShell.Invoke(". '" + WinForms.Application.StartupPath + @"\Get-MediaInfo.ps1" +
+                $"'; Get-ChildItem '{Path.GetDirectoryName(SourcePath)}' | Get-MediaInfo | Out-GridView"));
         }
     }
 }

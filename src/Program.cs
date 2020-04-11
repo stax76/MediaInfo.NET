@@ -1,8 +1,6 @@
 ﻿
-using Microsoft.Win32;
 using System;
-using System.IO;
-using WinForms = System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace MediaInfoNET
 {
@@ -13,53 +11,24 @@ namespace MediaInfoNET
         {
             try
             {
-                WinForms.Application.SetHighDpiMode(WinForms.HighDpiMode.PerMonitorV2);
                 Msg.SupportURL = "https://github.com/stax76/MediaInfo.NET/issues";
-
-                if (!File.Exists(App.SettingsFile))
-                {
-
-                    using TaskDialog<string> td = new TaskDialog<string>();
-                    td.MainInstruction = "Choose a settings directory.";
-                    td.AddCommand("AppData");
-                    td.AddCommand("Portable");
-                    td.AddCommand("Custom");
-                    td.AddCommand("Cancel");
-                    td.Show();
-
-                    if (string.IsNullOrEmpty(td.SelectedValue) || td.SelectedValue == "Cancel")
-                        return;
-
-                    switch (td.SelectedValue)
-                    {
-                        case "AppData":
-                            App.SettingsFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
-                                + "\\" + AppHelp.ProductName + "\\Settings.xml";
-                            break;
-                        case "Portable":
-                            App.SettingsFile = WinForms.Application.StartupPath + "\\Settings.xml";
-                            break;
-                        case "Custom":
-                            using (WinForms.FolderBrowserDialog dialog = new WinForms.FolderBrowserDialog())
-                            {
-                                if (dialog.ShowDialog() == WinForms.DialogResult.OK)
-                                    App.SettingsFile = dialog.SelectedPath + "\\Settings.xml";
-                                else
-                                    return;
-                            }
-                            break;
-                    }
-                }
 
                 if (args.Length == 1 && (args[0] == "--install" || args[0] == "--uninstall"))
                     Setup(args[0] == "--install");
                 else
-                    App.Main();
+                    AppMain();
             }
             catch (Exception ex)
             {
                 Msg.ShowException(ex);
             }
+        }
+
+        static void AppMain()
+        {
+            App app = new App();
+            app.InitializeComponent();
+            app.Run();
         }
 
         static void Setup(bool install)
@@ -81,7 +50,7 @@ namespace MediaInfoNET
                     RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET", null, "MediaInfo");
                     RegistryHelp.SetValue(@"HKCR\" + filekeyName + @"\shell\MediaInfo.NET\command", null, $"\"{AppHelp.ExecutablePath}\" \"%1\"");
 
-                    string userKeyName = RegistryHelp.GetString(@$"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.{ext}\UserChoice", "ProgId");
+                    string userKeyName = RegistryHelp.GetString(@"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\." + ext + @"\UserChoice", "ProgId");
                     
                     if (RegistryHelp.GetString(@"HKCR\" + userKeyName + @"\shell\open\command", null) != "")
                     {
@@ -102,17 +71,18 @@ namespace MediaInfoNET
                     RegistryHelp.RemoveKey(@"HKCR\" + RegistryHelp.GetString(@"HKCR\" + name, null) + @"\shell\MediaInfo.NET");
                 }
 
-                using RegistryKey fileExtsKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts");
-
-                if (fileExtsKey != null)
+                using (RegistryKey fileExtsKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts"))
                 {
-                    foreach (string name in fileExtsKey.GetSubKeyNames())
+                    if (fileExtsKey != null)
                     {
-                        if (!name.StartsWith("."))
-                            continue;
+                        foreach (string name in fileExtsKey.GetSubKeyNames())
+                        {
+                            if (!name.StartsWith("."))
+                                continue;
 
-                        string userKeyName = RegistryHelp.GetString(@$"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{name}\UserChoice", "ProgId");
-                        RegistryHelp.RemoveKey(@"HKCR\" + userKeyName + @"\shell\MediaInfo.NET");
+                            string userKeyName = RegistryHelp.GetString(@"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" + name + @"\UserChoice", "ProgId");
+                            RegistryHelp.RemoveKey(@"HKCR\" + userKeyName + @"\shell\MediaInfo.NET");
+                        }
                     }
                 }
 

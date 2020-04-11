@@ -8,11 +8,11 @@ using System.Windows.Forms;
 
 namespace MediaInfoNET
 {
-    class UpdateCheck
+    class Update
     {
-        public static event Action? Updating;
+        public static event Action Updating;
 
-        public static void DailyCheck()
+        public static void Check()
         {
             if (App.Settings.CheckForUpdates && RegistryHelp.GetInt(RegistryHelp.ApplicationKey, "UpdateCheckLast")
                 != DateTime.Now.DayOfYear)
@@ -33,7 +33,7 @@ namespace MediaInfoNET
                     string content = await response.Content.ReadAsStringAsync();
                     Match match = Regex.Match(content, @"""MediaInfo\.NET-([\d\.]+)\.7z""");
                     Version onlineVersion = Version.Parse(match.Groups[1].Value);
-                    Version? currentVersion = Assembly.GetEntryAssembly()?.GetName().Version;
+                    Version currentVersion = Assembly.GetEntryAssembly()?.GetName().Version;
 
                     if (onlineVersion <= currentVersion)
                     {

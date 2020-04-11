@@ -16,12 +16,12 @@ public class Msg
     private static string ShownMessages = "";
     public static string SupportURL { get; set; } = "";
 
-    public static void Show(string mainInstruction, string? content = null)
+    public static void Show(string mainInstruction, string content = null)
     {
         Msg.Show(mainInstruction, content, MsgIcon.Info, MsgButtons.Ok, MsgResult.None);
     }
 
-    public static void ShowError(string mainInstruction, string? content = null)
+    public static void ShowError(string mainInstruction, string content = null)
     {
         try
         {
@@ -83,16 +83,20 @@ public class Msg
         }
     }
 
-    public static void ShowWarning(string mainInstruction,
-                                   string? content = null,
-                                   bool onlyOnce = false)
+    public static void ShowWarning(
+        string mainInstruction,
+        string content = null,
+        bool onlyOnce = false)
     {
         if (onlyOnce && Msg.ShownMessages != null &&
             Msg.ShownMessages.Contains(mainInstruction + content))
             return;
 
         Msg.Show(mainInstruction, content, MsgIcon.Warning, MsgButtons.Ok, MsgResult.None);
-        if (!onlyOnce) return;
+
+        if (!onlyOnce)
+            return;
+
         Msg.ShownMessages += mainInstruction + content;
     }
 
@@ -102,18 +106,14 @@ public class Msg
         return Msg.Show(mainInstruction, null, MsgIcon.None, buttons, MsgResult.None);
     }
 
-    public static MsgResult ShowQuestion(string mainInstruction,
-                                         string content,
-                                         MsgButtons buttons = MsgButtons.OkCancel)
+    public static MsgResult ShowQuestion(
+        string mainInstruction, string content, MsgButtons buttons = MsgButtons.OkCancel)
     {
         return Msg.Show(mainInstruction, content, MsgIcon.None, buttons, MsgResult.None);
     }
 
-    public static MsgResult Show(string mainInstruction,
-                                 string? content,
-                                 MsgIcon icon,
-                                 MsgButtons buttons,
-                                 MsgResult defaultButton = MsgResult.None)
+    public static MsgResult Show(string mainInstruction, string content, MsgIcon icon,
+        MsgButtons buttons, MsgResult defaultButton = MsgResult.None)
     {
         try
         {
@@ -193,7 +193,7 @@ public class TaskDialog<T> : TaskDialogNative, IDisposable
     const int TDM_UPDATE_ELEMENT_TEXT = 1138;
     const int TDM_SET_BUTTON_ELEVATION_REQUIRED_STATE = 1139;
     const int TDM_UPDATE_ICON = 1140;
-    private string? SelectedTextValue;
+    private string SelectedTextValue;
     private int TimeoutValue;
     private int ExitTickCount;
     private bool disposed;
@@ -252,7 +252,7 @@ public class TaskDialog<T> : TaskDialogNative, IDisposable
         }
     }
 
-    public string? MainInstruction {
+    public string MainInstruction {
         get => Config.pszMainInstruction;
         set => Config.pszMainInstruction = value;
     }
@@ -262,12 +262,12 @@ public class TaskDialog<T> : TaskDialogNative, IDisposable
         set => Config.pszContent = ExpandMarkdownMarkup(value);
     }
 
-    public string? ExpandedInformation {
+    public string ExpandedInformation {
         get => Config.pszExpandedInformation;
         set => Config.pszExpandedInformation = ExpandMarkdownMarkup(value ?? "");
     }
 
-    public string? VerificationText {
+    public string VerificationText {
         get => Config.pszVerificationText;
         set => Config.pszVerificationText = value;
     }
@@ -567,12 +567,12 @@ public class TaskDialogNative
         public TaskDialogNative.TASKDIALOG_FLAGS dwFlags;
         public MsgButtons dwCommonButtons;
         [MarshalAs(UnmanagedType.LPWStr)]
-        public string? pszWindowTitle;
+        public string pszWindowTitle;
         public TaskDialogNative.TASKDIALOGCONFIG_ICON_UNION MainIcon;
         [MarshalAs(UnmanagedType.LPWStr)]
-        public string? pszMainInstruction;
+        public string pszMainInstruction;
         [MarshalAs(UnmanagedType.LPWStr)]
-        public string? pszContent;
+        public string pszContent;
         public uint cButtons;
         public IntPtr pButtons;
         public int nDefaultButton;
@@ -580,17 +580,17 @@ public class TaskDialogNative
         public IntPtr pRadioButtons;
         public int nDefaultRadioButton;
         [MarshalAs(UnmanagedType.LPWStr)]
-        public string? pszVerificationText;
+        public string pszVerificationText;
         [MarshalAs(UnmanagedType.LPWStr)]
-        public string? pszExpandedInformation;
+        public string pszExpandedInformation;
         [MarshalAs(UnmanagedType.LPWStr)]
-        public string? pszExpandedControlText;
+        public string pszExpandedControlText;
         [MarshalAs(UnmanagedType.LPWStr)]
-        public string? pszCollapsedControlText;
+        public string pszCollapsedControlText;
         public TaskDialogNative.TASKDIALOGCONFIG_ICON_UNION FooterIcon;
         [MarshalAs(UnmanagedType.LPWStr)]
-        public string? pszFooter;
-        public PFTASKDIALOGCALLBACK? pfCallback;
+        public string pszFooter;
+        public PFTASKDIALOGCALLBACK pfCallback;
         public IntPtr lpCallbackData;
         public uint cxWidth;
     }

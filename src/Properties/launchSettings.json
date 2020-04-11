@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "MediaInfo.NET": {
-      "commandName": "Project",
-      "commandLineArgs": "\"D:\\Samples\\ASS.mkv\""
-    }
-  }
-}

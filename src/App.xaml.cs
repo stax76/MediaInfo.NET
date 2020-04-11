@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
@@ -7,7 +8,10 @@ namespace MediaInfoNET
 {
     public partial class App : Application
     {
-        static AppSettings? _Settings;
+        public static string SettingsFile { get; } = Environment.GetFolderPath(
+            Environment.SpecialFolder.ApplicationData) + "\\" + AppHelp.ProductName + "\\Settings.xml";
+
+        static AppSettings _Settings;
 
         public static AppSettings Settings {
             get {
@@ -24,11 +28,6 @@ namespace MediaInfoNET
 
                 return _Settings;
             }
-        }
-
-        public static string SettingsFile {
-            get => RegistryHelp.GetString(RegistryHelp.ApplicationKey, "SettingsFile");
-            set => RegistryHelp.SetValue(RegistryHelp.ApplicationKey, "SettingsFile", value);
         }
 
         public static void SaveSettings()
