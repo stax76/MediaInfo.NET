@@ -6,6 +6,8 @@ Windows application that shows info about media files.
 
 ![](Main.png)
 
+![](Grid.png)
+
 
 Features
 --------
