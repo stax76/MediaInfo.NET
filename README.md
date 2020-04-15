@@ -61,8 +61,7 @@ https://github.com/stax76/Get-MediaInfo
 **StaxRip** is a video encoding GUI that integrates MediaInfo.NET.  
 https://github.com/staxrip/staxrip
 
-**mpv** and **mpv.net** are media players that allow to integrate MediaInfo.NET.  
-https://mpv.io  
+**mpv.net** is a media player that allows to integrate MediaInfo.NET.  
 https://github.com/stax76/mpv.net
 
 **Open with++** is a shell extension that can integrate MediaInfo.NET into Windows File Explorer with icon support.  
