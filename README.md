@@ -2,7 +2,7 @@
 MediaInfo.NET
 =============
 
-Windows application that shows info about media files.
+MediaInfo.NET is a Windows application that shows media file information.
 
 ![](Main.png)
 
@@ -36,11 +36,11 @@ For power users there is [Open with++](https://github.com/stax76/OpenWithPlusPlu
 Usage
 -----
 
-Open media files with the context menu in File Explorer or via drag & drop or from the app context menu.
+Open media files with the context menu in Windows File Explorer or via drag & drop or via context menu.
 
 The theme colors are not hard coded but defined in Settings.xml.
 
-Developers can enable raw view to show parameter names as they are used in the MediaInfo API.
+Developers can enable raw view to show the parameter names as they are used in the MediaInfo API.
 
 MediaInfo.NET registers itself in the registry at:
 
