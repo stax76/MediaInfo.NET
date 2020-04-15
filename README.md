@@ -21,16 +21,16 @@ Features
 - Many settings to change the appearance
 - Special presentation for encoding settings
 - Compact summary
-- Folder View powered by [PowerShell Out-GridView](https://github.com/stax76/Get-MediaInfo#examples)
+- Folder View powered by [Get-MediaInfo](https://github.com/stax76/Get-MediaInfo)
 - Update check and PowerShell based update feature
 
 
 Installation
 ------------
 
-Run MediaInfo.NET and right-click to show the context menu, choose Install to register file associations, File Explorer will then show a MediaInfo menu item in the context menu when a media file is right-clicked.
+Run MediaInfo.NET and right-click to show the context menu, choose Install to register file associations, Windows File Explorer will then show a MediaInfo menu item in the context menu when a media file is right-clicked.
 
-For power users there is [Open with++](https://github.com/stax76/OpenWithPlusPlus) for File Explorer integration with icon support.
+For power users there is [Open with++](https://github.com/stax76/OpenWithPlusPlus) for Windows File Explorer integration with icon support.
 
 
 Usage
@@ -65,5 +65,5 @@ https://github.com/staxrip/staxrip
 https://mpv.io  
 https://github.com/stax76/mpv.net
 
-**Open with++** is a shell extension that can integrate MediaInfo.NET into File Explorer.  
+**Open with++** is a shell extension that can integrate MediaInfo.NET into Windows File Explorer with icon support.  
 https://github.com/stax76/OpenWithPlusPlus
