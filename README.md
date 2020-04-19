@@ -4,9 +4,9 @@ MediaInfo.NET
 
 MediaInfo.NET is a Windows application that shows media file information.
 
-![](Main.png)
+![](img/Main.png)
 
-![](Grid.png)
+![](img/Grid.png)
 
 
 Features
