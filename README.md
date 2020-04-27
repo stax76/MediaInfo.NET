@@ -49,6 +49,14 @@ MediaInfo.NET registers itself in the registry at:
 This enables third party apps to find and start MediaInfo.NET.
 
 
+Support
+-------
+
+For bug report and feature requests the [issue tracker](issues) can be used.
+
+For usage questions please use the [support thread](https://forum.videohelp.com/threads/394691-MediaInfo-NET) in the VideoHelp forum, this tool is not very popular so every feedback is welcome.
+
+
 Related Projects
 ----------------
 
