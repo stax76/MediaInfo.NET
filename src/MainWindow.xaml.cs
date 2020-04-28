@@ -200,15 +200,15 @@ namespace MediaInfoNET
 
                 foreach (string line in summary.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    if (line.Contains(":"))
+                    if (line.Contains(": "))
                     {
                         MediaInfoParameter item = new MediaInfoParameter();
-                        item.Name = line.Substring(0, line.IndexOf(":")).Trim();
+                        item.Name = line.Substring(0, line.IndexOf(": ")).Trim();
 
                         if (exclude.Contains(item.Name))
                             continue;
 
-                        item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
+                        item.Value = line.Substring(line.IndexOf(": ") + 1).Trim();
                         item.Group = group;
                         item.IsComplete = true;
                         Fix(item, rawView);
@@ -227,15 +227,15 @@ namespace MediaInfoNET
 
                 foreach (string line in summary.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    if (line.Contains(":"))
+                    if (line.Contains(": "))
                     {
                         MediaInfoParameter item = new MediaInfoParameter();
-                        item.Name = line.Substring(0, line.IndexOf(":")).Trim();
+                        item.Name = line.Substring(0, line.IndexOf(": ")).Trim();
 
                         if (exclude.Contains(item.Name))
                             continue;
 
-                        item.Value = line.Substring(line.IndexOf(":") + 1).Trim();
+                        item.Value = line.Substring(line.IndexOf(": ") + 1).Trim();
                         item.Group = group;
                         Fix(item, rawView);
                         items.Add(item);
@@ -279,22 +279,6 @@ namespace MediaInfoNET
                     item.Name = item.Name.Replace("Reference frames", "ref frames");
 
                 FixS(item, "frame");
-            }
-            else if (item.Group == "Menu" && item.Name == "00" &&
-                item.Value.Contains("                     : "))
-            {
-                Match match = Regex.Match(item.Value, @"(\d\d:\d\d\.\d\d\d) +: +(.+)");
-
-                if (match.Success)
-                {
-                    item.Name = match.Groups[1].Value;
-                    item.Value = match.Groups[2].Value;
-                }
-
-                match = Regex.Match(item.Value, @"(\w\w:Chapter \d\d) / \w\w:Chapter \d\d");
-
-                if (match.Success)
-                    item.Value = item.Value.Replace(match.Value, match.Groups[1].Value);
             }
         }
 
