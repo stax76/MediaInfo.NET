@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using System.Threading;
 
 public class PowerShell
 {
@@ -18,11 +19,16 @@ public class PowerShell
     {
         using (var runspace = RunspaceFactory.CreateRunspace())
         {
-            runspace.ApartmentState = System.Threading.ApartmentState.STA;
+            runspace.ApartmentState = ApartmentState.STA;
             runspace.Open();
 
             using (var pipeline = runspace.CreatePipeline())
             {
+                Command cmd = new Command("Set-ExecutionPolicy");
+                cmd.Parameters.Add("ExecutionPolicy", "Unrestricted");
+                cmd.Parameters.Add("Scope", "Process");
+                pipeline.Commands.Add(cmd);
+
                 if (!string.IsNullOrEmpty(InitCode))
                     pipeline.Commands.AddScript(InitCode);
 

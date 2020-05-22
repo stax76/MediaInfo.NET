@@ -70,11 +70,11 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Misc.cs" />
-    <Compile Include="Portable\AppHelp.cs" />
-    <Compile Include="Portable\MediaInfo.cs" />
-    <Compile Include="Portable\RegistryHelp.cs" />
-    <Compile Include="Portable\TaskDialog.cs" />
-    <Compile Include="Portable\XmlSerializerHelp.cs" />
+    <Compile Include="AppHelp.cs" />
+    <Compile Include="MediaInfo.cs" />
+    <Compile Include="RegistryHelp.cs" />
+    <Compile Include="TaskDialog.cs" />
+    <Compile Include="XmlSerializerHelp.cs" />
     <Compile Include="PowerShell.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
