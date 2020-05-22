@@ -1,5 +1,13 @@
 
-### 5.4
+6.4.0.0
+-------
+
+- Update and Folder View feature did not work on systems
+  with restricted PowerShell execution policy
+
+
+5.4
+---
 
 - the navigation tab bar was only showing the format family
   like DTS, now it's showing the exact format like DTS XLL
@@ -7,14 +15,16 @@
 - new: update feature, requires PowerShell 5 and curl,
        an up to date Windows 10 system has both included
 
-### 5.3
+5.3
+---
 
 - in normal view language names are now shown instead of two letter language codes
 - MediaInfo API spelling errors were corrected
 - duplicated entries are now removed
 - critical fix: file associations did not work when UserChoice key was defined
 
-### 5.2
+5.2
+---
 
 - in the settings dialog the layout was improved,
   the font picker was replaced with a drop down and
@@ -33,7 +43,8 @@
   which has a improved presentation and copy and supports
   links in case of an error
 
-### 5.1
+5.1
+---
 
 - new setting 'Theme' added with 'Light', 'Dark' and 'System' option,
   theme colors are not hard coded but defined in Settings.xml
@@ -44,7 +55,8 @@
 - compact summary is no longer limited to raw view, it's now
   also available in normal view
  
-### 5.0
+5.0
+---
 
 - changelog added to repo
 - if no file is open message is shown
