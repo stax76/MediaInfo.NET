@@ -32,6 +32,8 @@ Run MediaInfo.NET and right-click to show the context menu, choose Install to re
 
 For power users there is [Open with++](https://github.com/stax76/OpenWithPlusPlus) for Windows File Explorer integration with icon support.
 
+On x86 replace MediaInfo.dll with the x86 version found on the [MediaInfo website](https://mediaarea.net/en/MediaInfo).
+
 
 Usage
 -----
