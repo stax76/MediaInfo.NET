@@ -1,9 +1,16 @@
 
+6.5.0.0 (not yet released)
+-------
+
+- the compact summary on the basic tab shows more audio
+  format info, for instance DTS XLL instead of only DTS.
+
+
 6.4.0.0
 -------
 
 - Update and Folder View feature did not work on systems
-  with restricted PowerShell execution policy
+  with restricted PowerShell execution policy.
 
 
 5.4

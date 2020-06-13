@@ -359,7 +359,7 @@ namespace MediaInfoNET
 
                         values.Add(lang);
 
-                        values.Add(GetValue(group, "Format"));
+                        values.Add(GetValue(group, "Format/String"));
                         values.Add(GetValue(group, "BitRate/String"));
                         values.Add(GetValue(group, "Channel(s)/String").Replace(" channels", "ch"));
                         values.Add(GetValue(group, "SamplingRate/String"));
