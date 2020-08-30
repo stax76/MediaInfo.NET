@@ -1,7 +1,8 @@
 
-6.5.0.0 (not yet released)
+6.6.0.0 (not yet released)
 -------
 
+- Long path support.
 - the compact summary on the basic tab shows more audio
   format info, for instance DTS XLL instead of only DTS.
 
