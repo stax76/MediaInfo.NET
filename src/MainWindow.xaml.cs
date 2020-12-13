@@ -37,7 +37,7 @@ namespace MediaInfoNET
             DataContext = this;
             ApplySettings();
             WriteShellRegistryKey();
-            Update.Updating += () => Dispatcher.Invoke(() => Close());
+            AutoUpdate.Updating += () => Dispatcher.Invoke(() => Close());
 
             if (Environment.GetCommandLineArgs().Length > 1)
                 LoadFile(Environment.GetCommandLineArgs()[1]);
@@ -1014,7 +1014,7 @@ namespace MediaInfoNET
 
         void Window_Activated(object sender, EventArgs e)
         {
-            Update.Check();
+            AutoUpdate.Check();
         }
 
         void WebsiteMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1032,7 +1032,7 @@ namespace MediaInfoNET
 
         void UpdateMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Update.CheckOnline(true);
+            AutoUpdate.CheckOnline(true);
         }
 
         void FolderMenuItem_Click(object sender, RoutedEventArgs e)

@@ -34,7 +34,7 @@ public class AppSettings
 
     public Theme DarkTheme { get; set; } = new Theme() {
         Foreground = "#E6E6E6",
-        Background = "#292929",
+        Background = "#2D2D30",
         Border = "Gray",
         TextSelection = "AliceBlue",
         ItemSelection = "DimGray",

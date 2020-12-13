@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace MediaInfoNET
 {
-    class Update
+    class AutoUpdate
     {
         public static event Action Updating;
 
@@ -54,7 +54,7 @@ namespace MediaInfoNET
                             proc.StartInfo.UseShellExecute = true;
                             proc.StartInfo.WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                             proc.StartInfo.FileName = "powershell.exe";
-                            proc.StartInfo.Arguments = $"-NoLogo -NoExit -NoProfile -ExecutionPolicy Unrestricted -File \"{Application.StartupPath + @"Update.ps1"}\" \"{url}\" \"{Application.StartupPath.TrimEnd('\\')}\"";
+                            proc.StartInfo.Arguments = $"-NoLogo -NoExit -NoProfile -ExecutionPolicy Bypass -File \"{Application.StartupPath + @"\Update.ps1"}\" \"{url}\" \"{Application.StartupPath.TrimEnd('\\')}\"";
 
                             if (Application.StartupPath.Contains("Program Files"))
                                 proc.StartInfo.Verb = "runas";
