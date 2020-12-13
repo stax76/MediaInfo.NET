@@ -31,7 +31,7 @@ namespace MediaInfoNET
                     var response = await client.GetAsync("https://api.github.com/repos/stax76/MediaInfo.NET/releases/latest");
                     response.EnsureSuccessStatusCode();
                     string content = await response.Content.ReadAsStringAsync();
-                    Match match = Regex.Match(content, @"""MediaInfo\.NET-([\d\.]+)\.7z""");
+                    Match match = Regex.Match(content, @"""MediaInfo\.NET-([\d\.]+)\.zip""");
                     Version onlineVersion = Version.Parse(match.Groups[1].Value);
                     Version currentVersion = Assembly.GetEntryAssembly()?.GetName().Version;
 
@@ -47,7 +47,7 @@ namespace MediaInfoNET
                         != onlineVersion.ToString() || showUpToDateMessage) && Msg.ShowQuestion(
                             $"New version {onlineVersion} is available, update now?") == MsgResult.OK)
                     {
-                        string url = $"https://github.com/stax76/MediaInfo.NET/releases/download/{onlineVersion}/MediaInfo.NET-{onlineVersion}.7z";
+                        string url = $"https://github.com/stax76/MediaInfo.NET/releases/download/{onlineVersion}/MediaInfo.NET-{onlineVersion}.zip";
 
                         using (Process proc = new Process())
                         {
