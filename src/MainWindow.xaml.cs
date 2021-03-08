@@ -40,7 +40,48 @@ namespace MediaInfoNET
             AutoUpdate.Updating += () => Dispatcher.Invoke(() => Close());
 
             if (Environment.GetCommandLineArgs().Length > 1)
-                LoadFile(Environment.GetCommandLineArgs()[1]);
+            {
+                foreach (string i in Environment.GetCommandLineArgs().Skip(1))
+                {
+                    if (File.Exists(i))
+                        LoadFile(i);
+                    else if (i.StartsWith("--theme-colors="))
+                    {
+                        string[] items = i.Substring(15).Split(',');
+
+                        foreach (string item in items)
+                        {
+                            string name = item.Substring(0, item.IndexOf(":"));
+                            string value = item.Substring(item.IndexOf(":") + 1);
+
+                            switch (name)
+                            {
+                                case "Background":
+                                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(value));
+                                    break;
+                                case "Foreground":
+                                    Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(value));
+                                    break;
+                                case "TextSelection":
+                                    TextSelectionColor = value;
+                                    break;
+                                case "ItemSelection":
+                                    ItemSelectionColor = value;
+                                    break;
+                                case "ItemHover":
+                                    ItemHoverColor = value;
+                                    break;
+                                case "Border":
+                                    BorderColor = value;
+                                    break;
+                                case "Highlight":
+                                    HighlightColor = value;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
             else
                 SetText("Drag files here or right-click.");
         }

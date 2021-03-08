@@ -112,6 +112,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="..\Changelog.md">
+      <Link>Changelog.md</Link>
+    </None>
     <None Include="App.manifest" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -121,9 +124,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Info.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icon.ico" />
