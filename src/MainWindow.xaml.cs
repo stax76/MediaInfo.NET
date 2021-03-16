@@ -370,17 +370,26 @@ namespace MediaInfoNET
 
                 sb.AppendLine("G: " + Join(values) + "\r\n");
 
-                if (GetValue("Video", "Format") != "")
+                var videoGroups = Items.Where(item => item.Group.StartsWith("Video"))
+                       .Select(item => item.Group)
+                       .Distinct();
+
+                if (videoGroups.Count() > 0)
                 {
-                    values.Clear();
-                    
-                    values.Add(GetValue("Video", "Format"));
-                    values.Add(GetValue("Video", "Format_Profile"));
-                    values.Add(GetValue("Video", "Width") + "x" + GetValue("Video", "Height"));
-                    values.Add(GetValue("Video", "FrameRate").Replace(".000", "") + " FPS");
-                    values.Add(GetValue("Video", "BitRate/String"));
+                    foreach (string group in videoGroups)
+                    {
+                        values.Clear();
+
+                        values.Add(GetValue(group, "Format"));
+                        values.Add(GetValue(group, "Format_Profile"));
+                        values.Add(GetValue(group, "Width") + "x" + GetValue("Video", "Height"));
+                        values.Add(GetValue(group, "FrameRate").Replace(".000", "") + " FPS");
+                        values.Add(GetValue(group, "BitRate/String"));
     
-                    sb.AppendLine("V: " + Join(values) + "\r\n");
+                        sb.AppendLine("V: " + Join(values));
+                    }
+
+                    sb.AppendLine();
                 }
 
                 var audioGroups = Items.Where(item => item.Group.StartsWith("Audio"))

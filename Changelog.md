@@ -1,10 +1,11 @@
 
-### 6.9.0.0 (not yet released but already available within StaxRip Betas)
+### 7.0.0.0
 
 - Long path support.
 - Theme colors can be passed via CLI, StaxRip uses it.
 - The compact summary on the basic tab shows more audio
   format info, for instance DTS XLL instead of only DTS.
+- Fixed only one video stream shown in Basic view.
 
 
 6.4.0.0

@@ -15,7 +15,7 @@ public class AppSettings
     public int WindowHeight { get; set; } = 550;
     public int ColumnPadding { get; set; } = 32;
 
-    public double FontSize { get; set; } = 14;
+    public double FontSize { get; set; } = 13;
     
     public string FontName { get; set; } = "Consolas";
     public string Exclude { get; set; } = "";
