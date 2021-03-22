@@ -794,6 +794,7 @@ namespace MediaInfoNET
             switches["limit-tu"] = "Analysis";
             switches["max-tu-size"] = "Analysis";
             switches["min-cu-size"] = "Analysis";
+            switches["psy-rd"] = "Analysis";
             switches["psy-rdoq"] = "Analysis";
             switches["qp-adaptation-range"] = "Analysis";
             switches["rd"] = "Analysis";
@@ -935,7 +936,6 @@ namespace MediaInfoNET
             switches["lambda-file"] = "Other";
             switches["lowpass-dct"] = "Other";
             switches["max-ausize-factor"] = "Other";
-            switches["psy-rd"] = "Other";
             switches["qpfile"] = "Other";
             switches["recon"] = "Other";
             switches["recon-depth"] = "Other";

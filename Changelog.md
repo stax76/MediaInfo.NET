@@ -6,6 +6,7 @@
 - The compact summary on the basic tab shows more audio
   format info, for instance DTS XLL instead of only DTS.
 - Fixed only one video stream shown in Basic view.
+- psy-rd moved to Analysis section (user request)
 
 
 6.4.0.0
