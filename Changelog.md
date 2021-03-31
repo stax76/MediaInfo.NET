@@ -1,4 +1,10 @@
 
+### 7.2.0.0 (not yet released)
+
+- Next/Previous uses only known media file types
+- Larger list of known media file types
+
+
 ### 7.1.0.0
 
 - MediaInfo 21.3

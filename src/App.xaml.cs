@@ -17,8 +17,8 @@ namespace MediaInfoNET
             get {
                 if (_Settings == null)
                 {
-                    if (File.Exists(App.SettingsFile))
-                        _Settings = XmlSerializerHelp.LoadXML<AppSettings>(App.SettingsFile);
+                    if (File.Exists(SettingsFile))
+                        _Settings = XmlSerializerHelp.LoadXML<AppSettings>(SettingsFile);
                     else
                     {
                         _Settings = new AppSettings();

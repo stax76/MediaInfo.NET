@@ -573,7 +573,9 @@ namespace MediaInfoNET
             if (!File.Exists(SourcePath))
                 return;
 
-            string[] files = Directory.GetFiles(Path.GetDirectoryName(SourcePath));
+            string[] files = Directory.GetFiles(Path.GetDirectoryName(SourcePath))
+                .Where(i => App.Settings.FileTypes.Contains(
+                    Path.GetExtension(i).ToLowerInvariant().TrimStart('.'))).ToArray();
 
             if (files.Length < 2)
                 return;

@@ -20,7 +20,7 @@ public class AppSettings
     public string FontName { get; set; } = "Consolas";
     public string Exclude { get; set; } = "";
     public string Theme { get; set; } = "Light";
-    public string FileTypes { get; set; } = "avi mp4 mkv mov webm mpg vob ts m2ts wmv flv mp2 mp3 mpa ogg opus mka dts dtshd ac3 eac3 thd wav flac sup ass png jpg gif bmp";
+    public string FileTypes { get; set; } = "264 265 3gp aac ac3 apng ass avc avi bmp divx dts dtshd dtshr dtsma eac3 ec3 evo flac flv gif h264 h265 hevc hvc idx ivf jpe jpeg jpg m2t m2ts m2v m4a m4v mka mkv mlp mov mp2 mp3 mp4 mpa mpeg mpg mpv mts ogg ogm opus pcm png psb psd pva raw rmvb smi srt ssa ssf sup thd thd+ac3 tif truehd ts ttxt usf vdr vob w64 wav webm wmv y4m";
 
     public Theme LightTheme { get; set; } = new Theme() {
         Foreground = "#252525",
