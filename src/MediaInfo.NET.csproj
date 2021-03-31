@@ -115,6 +115,9 @@
     <None Include="..\Changelog.md">
       <Link>Changelog.md</Link>
     </None>
+    <None Include="..\README.md">
+      <Link>README.md</Link>
+    </None>
     <None Include="App.manifest" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

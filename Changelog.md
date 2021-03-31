@@ -1,4 +1,11 @@
 
+### 7.1.0.0
+
+- MediaInfo 21.3
+- Get-MediaInfo 3.7
+- psy-rd moved to Analysis section
+
+
 ### 7.0.0.0
 
 - Long path support.
@@ -6,7 +13,6 @@
 - The compact summary on the basic tab shows more audio
   format info, for instance DTS XLL instead of only DTS.
 - Fixed only one video stream shown in Basic view.
-- psy-rd moved to Analysis section (user request)
 
 
 6.4.0.0
