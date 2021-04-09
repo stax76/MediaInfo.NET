@@ -17,6 +17,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 using Microsoft.Win32;
+
 using WinForms = System.Windows.Forms;
 
 namespace MediaInfoNET
@@ -195,7 +196,21 @@ namespace MediaInfoNET
             captionNames.Add("Advanced");
 
             ItemsRaw = GetItems(true);
-            Items = App.Settings.RawView ? ItemsRaw : GetItems(false);
+
+            var dtsGroups = ItemsRaw.Where(i => i.Name == "Format/String" && i.Value == "DTS").Select(i => i.Group);
+
+            if (dtsGroups.Count() > 0)
+                ItemsRaw = ItemsRaw.Where(i => !(dtsGroups.Contains(i.Group) && (i.Name == "BitDepth/String" || i.Name == "BitDepth"))).ToList();
+
+            if (App.Settings.RawView)
+                Items = ItemsRaw;
+            else
+            {
+                Items = GetItems(false);
+
+                if (dtsGroups.Count() > 0)
+                    Items = Items.Where(i => !(dtsGroups.Contains(i.Group) && i.Name == "Bit depth")).ToList();
+            }
 
             foreach (MediaInfoParameter item in Items)
                 captionNames.Add(item.Group);

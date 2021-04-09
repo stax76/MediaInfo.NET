@@ -3,6 +3,7 @@
 
 - Next/Previous uses only known media file types
 - Larger list of known media file types
+- Bit depth parameter is hidden for DTS
 
 
 ### 7.1.0.0
