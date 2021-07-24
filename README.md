@@ -59,20 +59,9 @@ For bug report and feature requests the [issue tracker](../../issues) can be use
 For usage questions please use the [support thread](https://forum.videohelp.com/threads/394691-MediaInfo-NET) in the VideoHelp forum. This tool is not very popular so every feedback is welcome.
 
 
-Related Projects
-----------------
+Related apps
+------------
 
-**MediaInfo** is the library which MediaInfo.NET is based on.  
-https://mediaarea.net/en/MediaInfo
+Find a list of related apps:
 
-**Get-MediaInfo** is a complete PowerShell MediaInfo solution.  
-https://github.com/stax76/Get-MediaInfo
-
-**StaxRip** is a video encoding GUI that integrates MediaInfo.NET.  
-https://github.com/staxrip/staxrip
-
-**mpv.net** is a media player that allows to integrate MediaInfo.NET.  
-https://github.com/stax76/mpv.net
-
-**Open with++** is a shell extension that can integrate MediaInfo.NET into Windows File Explorer with icon support.  
-https://github.com/stax76/OpenWithPlusPlus
+https://stax76.github.io/frankskare
