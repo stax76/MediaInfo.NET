@@ -32,10 +32,10 @@ namespace MediaInfoNET
 
         public static void SaveSettings()
         {
-            if (!Directory.Exists(Path.GetDirectoryName(App.SettingsFile)))
-                Directory.CreateDirectory(Path.GetDirectoryName(App.SettingsFile));
+            if (!Directory.Exists(Path.GetDirectoryName(SettingsFile)))
+                Directory.CreateDirectory(Path.GetDirectoryName(SettingsFile));
 
-            XmlSerializerHelp.SaveXML(App.SettingsFile, Settings);
+            XmlSerializerHelp.SaveXML(SettingsFile, Settings);
         }
 
         public App()
