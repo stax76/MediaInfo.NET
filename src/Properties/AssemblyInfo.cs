@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Frank Skare (stax76)")]
 [assembly: AssemblyProduct("MediaInfo.NET")]
-[assembly: AssemblyCopyright("Copyright (C) 2019-2021 Frank Skare (stax76)")]
+[assembly: AssemblyCopyright("Copyright (C) 2019-2022 Frank Skare (stax76)")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("7.1.0.0")]
-[assembly: AssemblyFileVersion("7.1.0.0")]
+[assembly: AssemblyVersion("7.2.0.0")]
+[assembly: AssemblyFileVersion("7.2.0.0")]

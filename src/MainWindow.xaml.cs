@@ -1076,7 +1076,7 @@ namespace MediaInfoNET
             Msg.Show(AppHelp.ProductName + " " + WinForms.Application.ProductVersion,
                 "MediaInfo " + FileVersionInfo.GetVersionInfo(WinForms.Application
                 .StartupPath + @"\MediaInfo.dll").ProductVersion +
-                "\n\nCopyright (C) 2019-2020 Frank Skare (stax76)\n\nMIT License");
+                "\n\nCopyright (C) 2019-2022 Frank Skare (stax76)\n\nMIT License");
         }
 
         void Window_Activated(object sender, EventArgs e)
