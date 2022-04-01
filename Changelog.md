@@ -1,10 +1,10 @@
 
 ### 7.2.0.0
 
-- Next/Previous uses only known media file types
-  as defined in the settings
+- Next/Previous uses only known media file types as defined in the settings
 - Larger list of known media file types
 - Bit depth parameter is hidden for DTS
+- Rebuild of corrupted settings file
 - MediaInfo 22.03
 
 
