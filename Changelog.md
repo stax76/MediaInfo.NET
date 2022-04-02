@@ -1,4 +1,8 @@
 
+### 7.3.0.0
+
+- Fix crash using relative media file paths.
+
 ### 7.2.0.0
 
 - Next/Previous uses only known media file types as defined in the settings

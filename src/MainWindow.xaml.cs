@@ -185,7 +185,11 @@ namespace MediaInfoNET
 
             SaveMenuItem.IsEnabled = true;
             FolderMenuItem.IsEnabled = true;
-            PreviousMenuItem.IsEnabled = Directory.GetFiles(Path.GetDirectoryName(file)).Length > 1;
+            string folder = Path.GetDirectoryName(file);
+
+            if (Directory.Exists(folder))
+                PreviousMenuItem.IsEnabled = Directory.GetFiles(Path.GetDirectoryName(file)).Length > 1;
+
             NextMenuItem.IsEnabled = PreviousMenuItem.IsEnabled;
             SourcePath = file;
             Title = file + " - " + AppHelp.ProductName + " " + WinForms.Application.ProductVersion;
