@@ -59,9 +59,9 @@ For bug report and feature requests the [issue tracker](../../issues) can be use
 For usage questions please use the [support thread](https://forum.videohelp.com/threads/394691-MediaInfo-NET) in the VideoHelp forum. This tool is not very popular so every feedback is welcome.
 
 
-Related apps
-------------
+Other projects from me
+----------------------
 
-Find a list of related apps:
+A list of my other projects can be found here:
 
-https://stax76.github.io/frankskare
+https://stax76.github.io/software-list
